@@ -9,6 +9,10 @@ namespace Optimizely26.Models.Pages
         GroupName = Globals.GroupNames.Specialized
     )]
     [ImageUrl("/pages/CMS-icon-page-02.png")]
+    [AvailableContentTypes(
+        Availability.Specific,
+        Include = new[] { typeof(SettingsPage) }
+    )]
     public class StartPage : SitePageData
     {
         [Display(

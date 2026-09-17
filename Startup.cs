@@ -2,6 +2,7 @@ using EPiServer.Cms.UI.AspNetIdentity;
 using EPiServer.DependencyInjection;
 using EPiServer.Scheduler;
 using EPiServer.Web.Routing;
+using Optimizely26.Business.Extensions;
 
 namespace Optimizely26
 {
@@ -19,6 +20,7 @@ namespace Optimizely26
             services
                 .AddCmsAspNetIdentity<ApplicationUser>()
                 .AddCms()
+                .AddNackademin()
                 .AddAdminUserRegistration()
                 .AddEmbeddedLocalization<Startup>();
         }
