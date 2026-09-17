@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<languages>
+	<language name="English" id="en">
+		<contenttypes>
+			<icontentdata>
+				<properties>
+					<metadescription>
+						<caption>Meta Description</caption>
+						<help>Add a meta description</help>
+					</metadescription>
+				</properties>
+			</icontentdata>
+			<startpage>
+				<properties>
+					<title>
+						<caption>Title</caption>
+						<help>Add a title</help>
+					</title>
+				</properties>
+			</startpage>
+		</contenttypes>
+	</language>
+	<language name="Svenska" id="sv">
+		<contenttypes>
+			<icontentdata>
+				<properties>
+					<metadescription>
+						<caption>Metabeskrivning</caption>
+						<help>Lägg till en metabeskrivning</help>
+					</metadescription>
+				</properties>
+			</icontentdata>
+			<startpage>
+				<properties>
+					<title>
+						<caption>Titel</caption>
+						<help>Lägg till en titel</help>
+					</title>
+				</properties>
+			</startpage>
+		</contenttypes>
+	</language>
+</languages>
