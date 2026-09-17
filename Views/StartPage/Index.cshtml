@@ -1,5 +1,10 @@
 ﻿@using Optimizely26.Models.ViewModels
+@using EPiServer.Web.Mvc.Html
 
 @model StartPageViewModel
 
-<h1>@Model.CurrentPage.Title</h1>
+<h1>@Html.Raw(Model.CurrentPage.Title)</h1>
+<h2>@Html.Raw(Model.CurrentPage.Preamble)</h2>
+<p>@Html.Raw(Model.CurrentPage.MainBody)</p>
+
+<img src="@Url.ContentUrl(Model.CurrentPage.Image)" />

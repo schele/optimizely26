@@ -1,4 +1,5 @@
-﻿using Optimizely26.Business;
+﻿using EPiServer.Web;
+using Optimizely26.Business;
 using System.ComponentModel.DataAnnotations;
 
 namespace Optimizely26.Models.Pages
@@ -16,5 +17,28 @@ namespace Optimizely26.Models.Pages
         )]
         [CultureSpecific]
         public virtual string Title { get; set; } = string.Empty;
+
+        [Display(
+            GroupName = SystemTabNames.Content,
+            Order = 20
+        )]
+        [CultureSpecific]
+        [UIHint(UIHint.Textarea)]
+        public virtual string Preamble { get; set; } = string.Empty;
+
+        [Display(
+            GroupName = SystemTabNames.Content,
+            Order = 30
+        )]
+        [CultureSpecific]
+        [ScaffoldColumn(false)]
+        public virtual XhtmlString MainBody { get; set; }
+
+        [Display(
+            GroupName = SystemTabNames.Content,
+            Order = 40
+        )]
+        [UIHint(UIHint.Image)]
+        public virtual ContentReference Image { get; set; }
     }
 }
