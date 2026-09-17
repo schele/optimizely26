@@ -22,4 +22,8 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\Translations\**\*" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <Folder Include="wwwroot\pages\" />
+  </ItemGroup>
 </Project>
