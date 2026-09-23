@@ -3,11 +3,13 @@
 
 @model StartPageViewModel
 
-<h1>@Html.Raw(Model.CurrentPage.Title)</h1>
+@* <h1>@Html.Raw(Model.CurrentPage.Title)</h1>
 <h2>@Html.Raw(Model.CurrentPage.Preamble)</h2>
 <p>@Html.Raw(Model.CurrentPage.MainBody)</p>
 
 <img src="@Url.ContentUrl(Model.CurrentPage.Image)" />
 
 <h5>@Model.Layout.StartPage.Name</h5>
-<h5>@Model.Layout.SettingsPage?.LinkToMovies</h5>
+<h5>@Model.Layout.SettingsPage?.LinkToMovies</h5> *@
+
+@Html.PropertyFor(model => model.CurrentPage.Carousel)

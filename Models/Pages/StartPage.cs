@@ -1,5 +1,6 @@
 ﻿using EPiServer.Web;
 using Optimizely26.Business;
+using Optimizely26.Models.Blocks;
 using System.ComponentModel.DataAnnotations;
 
 namespace Optimizely26.Models.Pages
@@ -11,7 +12,10 @@ namespace Optimizely26.Models.Pages
     [ImageUrl("/pages/CMS-icon-page-02.png")]
     [AvailableContentTypes(
         Availability.Specific,
-        Include = new[] { typeof(SettingsPage) }
+        Include = new[] {
+            typeof(SettingsPage),
+            typeof(ContainerPage)
+        }
     )]
     public class StartPage : SitePageData
     {
@@ -44,5 +48,15 @@ namespace Optimizely26.Models.Pages
         )]
         [UIHint(UIHint.Image)]
         public virtual ContentReference Image { get; set; }
+
+        [Display(
+            GroupName = SystemTabNames.Content,
+            Order = 0
+        )]
+        [CultureSpecific]
+        [AllowedTypes(
+            typeof(CarouselBlock)
+        )]
+        public virtual ContentArea Carousel { get; set; }
     }
 }

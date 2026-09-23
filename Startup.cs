@@ -22,6 +22,7 @@ namespace Optimizely26
                 .AddCms()
                 .AddNackademin()
                 .AddAdminUserRegistration()
+                .Configure<MediaFileOptions>(x => { x.FileSizeLimit = 52428800; })
                 .AddEmbeddedLocalization<Startup>();
         }
 
