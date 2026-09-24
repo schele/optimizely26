@@ -1,0 +1,56 @@
+﻿@using System.Text
+@using Optimizely26.Business.Extensions
+@using Optimizely26.Models.ViewModels
+
+@inject IHttpContextAccessor _contentAccessor
+
+@model XmlSitemapViewModel
+
+@{
+    Layout = null;
+
+    _contentAccessor.HttpContext.Response.Clear();
+    _contentAccessor.HttpContext.Response.ContentType = "text/xml";
+
+    var stringBuilder = new StringBuilder();
+    var url = new StringBuilder();
+    var xmlversion = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
+    var urlsetStart = "<urlset xmlns=\"https://www.sitemaps.org/schemas/sitemap/0.9\">";
+    var urlsetEnd = "</urlset>";
+
+    if (Model.Pages != null)
+    {
+        foreach (var page in Model.Pages)
+
+        {
+            var icontent = (IContent)page;
+            var externalUrl = icontent.GetExternalUrl();
+
+            if (externalUrl != null)
+            {
+                var pageUrl = new Uri(externalUrl);
+
+                if (page.LinkType == PageShortcutType.External)
+                {
+                    pageUrl = new Uri(page.LinkURL.Contains(".aspx") ? page.LinkURL.Url() : page.LinkURL);
+                }
+
+                if (page.XmlSitemapDate.HasValue)
+                {
+                    var xmlSitemapDate = page.XmlSitemapDate.Value.ToString("d", Thread.CurrentThread.CurrentCulture);
+                    url.Append("<url><loc>" + pageUrl + "</loc><lastmod>" + xmlSitemapDate + "</lastmod></url>");
+                }
+                else
+                {
+                    url.Append("<url><loc>" + pageUrl + "</loc><lastmod></lastmod></url>");
+                }
+            }
+        }
+    }
+
+    stringBuilder.Append(xmlversion);
+    stringBuilder.Append(urlsetStart);
+    stringBuilder.Append(url);
+    stringBuilder.Append(urlsetEnd);
+    await _contentAccessor.HttpContext.Response.WriteAsync(stringBuilder.ToString());
+}

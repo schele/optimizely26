@@ -15,7 +15,8 @@ namespace Optimizely26.Models.Pages
         Include = new[] {
             typeof(SettingsPage),
             typeof(ContainerPage),
-            typeof(ErrorPage)
+            typeof(ErrorPage),
+            typeof(XmlSitemap)
         }
     )]
     public class StartPage : SitePageData

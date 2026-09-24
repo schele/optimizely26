@@ -3,6 +3,8 @@ using EPiServer.DependencyInjection;
 using EPiServer.Scheduler;
 using EPiServer.Web.Routing;
 using Optimizely26.Business.Extensions;
+using Optimizely26.Business.Services;
+using Optimizely26.Business.Services.Interfaces;
 
 namespace Optimizely26
 {
@@ -22,8 +24,10 @@ namespace Optimizely26
                 .AddCms()
                 .AddNackademin()
                 .AddAdminUserRegistration()
-                .Configure<MediaFileOptions>(x => { x.FileSizeLimit = 52428800; })
+                .Configure<MediaFileOptions>(x => { x.FileSizeLimit = 52428800; })                
                 .AddEmbeddedLocalization<Startup>();
+
+            services.AddScoped<IXmlSitemapService, XmlSitemapService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
