@@ -17,7 +17,6 @@
     <PackageReference Include="EPiServer.Cms.UI.AspNetIdentity" Version="13.0.0" />
     <!-- Transitive via EPiServer; pinned to a patched version (GHSA-9j88-vvj5-vhgr) -->
     <PackageReference Include="MailKit" Version="4.18.0" />
-    <PackageReference Include="UmbracoCms.Core" Version="8.18.15" />
   </ItemGroup>
   
   <ItemGroup>
