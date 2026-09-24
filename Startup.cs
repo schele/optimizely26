@@ -42,6 +42,18 @@ namespace Optimizely26
             {
                 endpoints.MapContent();
             });
+
+            app.UseStatusCodePages(context =>
+            {
+                var httpContext = context.HttpContext;
+
+                if (httpContext.Response.StatusCode == 404 && !httpContext.Request.Path.StartsWithSegments("/error"))
+                {
+                    httpContext.Response.Redirect("/error");
+                }
+
+                return Task.CompletedTask;
+            });
         }
     }
 }
