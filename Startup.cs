@@ -1,8 +1,10 @@
+using EPiServer.Cms.Shell.UI.Configurations;
 using EPiServer.Cms.UI.AspNetIdentity;
 using EPiServer.DependencyInjection;
 using EPiServer.Scheduler;
 using EPiServer.Web.Routing;
 using Optimizely26.Business.Extensions;
+using Optimizely26.Services;
 
 namespace Optimizely26
 {
@@ -22,8 +24,16 @@ namespace Optimizely26
                 .AddCms()
                 .AddNackademin()
                 .AddAdminUserRegistration()
-                .AddEmbeddedLocalization<Startup>();
-        }
+                .AddEmbeddedLocalization<Startup>()
+
+
+                .Configure<MediaFileOptions>(x => { x.FileSizeLimit = 52428800; });
+			
+            
+            services.AddScoped<IXmlSitemapService, XmlSitemapService>();
+
+
+		}
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
@@ -31,6 +41,19 @@ namespace Optimizely26
             {
                 app.UseDeveloperExceptionPage();
             }
+
+			app.UseStatusCodePages(context =>
+			{
+				var httpContext = context.HttpContext;
+
+				if (httpContext.Response.StatusCode == 404 &&
+					!httpContext.Request.Path.StartsWithSegments("/error"))
+				{
+					httpContext.Response.Redirect("/error");
+				}
+
+				return Task.CompletedTask;
+			});
 
             app.UseStaticFiles();
             app.UseRouting();
@@ -41,6 +64,6 @@ namespace Optimizely26
             {
                 endpoints.MapContent();
             });
-        }
+		}
     }
 }

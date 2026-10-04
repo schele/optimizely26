@@ -9,7 +9,6 @@ namespace Optimizely26.Business
     public class PageViewContextFactory
     {
         private readonly IContentLoader _contentLoader;
-        private StartPage _startPage;
 
         public PageViewContextFactory(IContentLoader contentLoader)
         {
@@ -25,28 +24,23 @@ namespace Optimizely26.Business
                 startPageContentLink = contentReference;
             }
 
-            _startPage = _contentLoader.Get<StartPage>(startPageContentLink);
+            var startPage = _contentLoader.Get<StartPage>(startPageContentLink);
 
             return new LayoutModel()
             {
-                StartPage = _startPage,
-                SettingsPage = GetSettingsPage()
+                StartPage = startPage,
+                SettingsPage = GetSettingsPage(startPage)
             };
         }
 
-        private SettingsPage? GetSettingsPage()
+        private SettingsPage? GetSettingsPage(StartPage? startPage)
         {
-            if (_startPage != null)
+            if (startPage == null)
             {
-                var settingsPage = _contentLoader.GetChildren<SettingsPage>(_startPage.ContentLink).FirstOrDefault();
-
-                if (settingsPage != null)
-                {
-                    return settingsPage;
-                }
+                return null;
             }
 
-            return null;
+            return _contentLoader.GetChildren<SettingsPage>(startPage.ContentLink).FirstOrDefault();
         }
     }
 }
