@@ -9,7 +9,7 @@ namespace Optimizely26.Business.Extensions
 			var startPage = contentLoader.Get<SitePageData>(contentReference);
 			var descendants = contentLoader.GetDescendents(contentReference)
 				.Select(contentLoader.Get<IContent>)
-				.Where(content => content is SitePageData and not XmlSitemap)
+				.Where(content => content is SitePageData and not XmlSitemap and not ErrorPage)
 				.Cast<SitePageData>();
 
 			return new[] { startPage }.Concat(descendants);
