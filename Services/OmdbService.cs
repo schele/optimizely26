@@ -12,9 +12,7 @@ namespace Optimizely26.Services
 		{
 			try
 			{
-				var apiKey = _configuration["Omdb:ApiKey"];
-				var url = $"https://www.omdbapi.com/?s={Uri.EscapeDataString(search.Query)}&apikey={apiKey}";
-				var result = await _httpClient.GetFromJsonAsync<OmdbSearchResponse>(url);
+				var result = await _httpClient.GetFromJsonAsync<OmdbSearchResponse>(ApiUrl($"s={Uri.EscapeDataString(search.Query)}"));
 
 				if (result != null)
 				{
@@ -28,5 +26,27 @@ namespace Optimizely26.Services
 
 			return [];
 		}
+
+		public async Task<OmdbMovieDetails?> GetByIdAsync(string imdbId)
+		{
+			try
+			{
+				var movie = await _httpClient.GetFromJsonAsync<OmdbMovieDetails>(ApiUrl($"i={Uri.EscapeDataString(imdbId)}&plot=full"));
+
+				// OMDb answers unknown ids with 200 and Response "False"
+				if (movie != null && movie.Response == "True")
+				{
+					return movie;
+				}
+			}
+			catch (Exception e)
+			{
+				_logger.LogError(e, "OMDb lookup of {ImdbId} failed", imdbId);
+			}
+
+			return null;
+		}
+
+		private string ApiUrl(string query) => $"https://www.omdbapi.com/?{query}&apikey={_configuration["Omdb:ApiKey"]}";
 	}
 }
