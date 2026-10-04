@@ -1,4 +1,4 @@
-﻿using Optimizely26.Models.Pages;
+using Optimizely26.Models.Pages;
 
 namespace Optimizely26.Models.ViewModels
 {
@@ -7,5 +7,8 @@ namespace Optimizely26.Models.ViewModels
         public StartPageViewModel(StartPage currentPage) : base(currentPage)
         {
         }
+
+        /// <summary>The first published movie page; null when there is none, and results link to IMDb.</summary>
+        public string? MoviePageUrl { get; init; }
     }
 }

@@ -12,6 +12,10 @@
     [Parameter]
     public string CultureName { get; set; } = string.Empty;
 
+    /// <summary>The movie page; when missing, results link to IMDb instead.</summary>
+    [Parameter]
+    public string? MoviePageUrl { get; set; }
+
     private CultureInfo CultureInfo { get; set; } = CultureInfo.InvariantCulture;
     private OmdbSearchModel SearchModel = new OmdbSearchModel();
     private List<OmdbMovie>? Movies = [];
@@ -136,7 +140,14 @@
                         </div>
                         <div class="card-body">
                             <h3 class="card-title h6 mb-1">
-                                <a href="https://www.imdb.com/title/@item.ImdbID/" class="stretched-link clean-link" target="_blank" rel="noopener">@item.Title</a>
+                                @if (MoviePageUrl != null)
+                                {
+                                    <a href="@($"{MoviePageUrl}?id={Uri.EscapeDataString(item.ImdbID)}")" class="stretched-link clean-link">@item.Title</a>
+                                }
+                                else
+                                {
+                                    <a href="https://www.imdb.com/title/@item.ImdbID/" class="stretched-link clean-link" target="_blank" rel="noopener">@item.Title</a>
+                                }
                             </h3>
                             <p class="card-text small text-body-secondary mb-0">@item.Year</p>
                         </div>

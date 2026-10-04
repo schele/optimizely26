@@ -9,4 +9,4 @@
 
 @await Component.InvokeAsync("Carousel")
 
-<component type="typeof(OmdbSearchPage)" render-mode="Server" param-CultureName="@cultureName" />
+<component type="typeof(OmdbSearchPage)" render-mode="Server" param-CultureName="@cultureName" param-MoviePageUrl="@Model.MoviePageUrl" />
