@@ -19,7 +19,7 @@ namespace Optimizely26.Models.Blocks
 			Order = 10
 		)]
 		[AllowedTypes(typeof(CarouselPage))]
-		public virtual ContentArea Carousel { get; set; }
+		public virtual ContentArea? Carousel { get; set; }
 	}
 
 

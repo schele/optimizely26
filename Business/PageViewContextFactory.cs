@@ -1,5 +1,5 @@
-﻿using EPiServer.ServiceLocation;
-using EPiServer.Web;
+﻿using EPiServer.Applications;
+using EPiServer.ServiceLocation;
 using Optimizely26.Models.Pages;
 using Optimizely26.Models.ViewModels;
 
@@ -9,15 +9,17 @@ namespace Optimizely26.Business
     public class PageViewContextFactory
     {
         private readonly IContentLoader _contentLoader;
+        private readonly IApplicationResolver _applicationResolver;
 
-        public PageViewContextFactory(IContentLoader contentLoader)
+        public PageViewContextFactory(IContentLoader contentLoader, IApplicationResolver applicationResolver)
         {
             _contentLoader = contentLoader;
+            _applicationResolver = applicationResolver;
         }
 
         public virtual LayoutModel GetLayoutModel(ContentReference contentReference, HttpContext httpContext)
         {
-            var startPageContentLink = SiteDefinition.Current.StartPage;
+            var startPageContentLink = (_applicationResolver.GetByContext() as IRoutableApplication)?.EntryPoint ?? ContentReference.EmptyReference;
 
             if (contentReference.CompareToIgnoreWorkID(startPageContentLink))
             {

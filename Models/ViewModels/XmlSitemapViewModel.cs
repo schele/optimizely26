@@ -9,7 +9,7 @@ namespace Optimizely26.Models.ViewModels
 		{
 		}
 
-		public IEnumerable<SitePageData> Pages { get; set; }
+		public IEnumerable<SitePageData> Pages { get; set; } = [];
 	}
 
 

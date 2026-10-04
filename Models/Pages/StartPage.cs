@@ -31,7 +31,7 @@ namespace Optimizely26.Models.Pages
             typeof(CarouselPage),
 			typeof(CarouselBlock)
 		)]
-        public virtual ContentArea Carousel { get; set; }
+        public virtual ContentArea? Carousel { get; set; }
 
         [Display(
             GroupName = SystemTabNames.Content,
@@ -54,13 +54,13 @@ namespace Optimizely26.Models.Pages
         )]
         [CultureSpecific]
         [ScaffoldColumn(false)]
-        public virtual XhtmlString MainBody { get; set; }
+        public virtual XhtmlString? MainBody { get; set; }
 
         [Display(
             GroupName = SystemTabNames.Content,
             Order = 40
         )]
         [UIHint(UIHint.Image)]
-        public virtual ContentReference Image { get; set; }
+        public virtual ContentReference? Image { get; set; }
     }
 }

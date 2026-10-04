@@ -6,6 +6,6 @@ namespace Optimizely26.Models.ViewModels
     {
         T CurrentPage { get; }
 
-        LayoutModel Layout { get; set; }
+        LayoutModel? Layout { get; set; }
     }
 }

@@ -2,15 +2,13 @@
 @using Optimizely26.Business.Extensions
 @using Optimizely26.Models.ViewModels
 
-@inject IHttpContextAccessor _contentAccessor
-
 @model XmlSitemapViewModel
 
 @{
     Layout = null;
 
-    _contentAccessor.HttpContext.Response.Clear();
-    _contentAccessor.HttpContext.Response.ContentType = "text/xml";
+    Context.Response.Clear();
+    Context.Response.ContentType = "text/xml";
 
     var stringBuilder = new StringBuilder();
     var url = new StringBuilder();
@@ -52,5 +50,5 @@
     stringBuilder.Append(urlsetStart);
     stringBuilder.Append(url);
     stringBuilder.Append(urlsetEnd);
-    await _contentAccessor.HttpContext.Response.WriteAsync(stringBuilder.ToString());
+    await Context.Response.WriteAsync(stringBuilder.ToString());
 }

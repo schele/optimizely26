@@ -11,7 +11,7 @@ namespace Optimizely26.Models.ViewModels
 
         public T CurrentPage { get; }
      
-        public LayoutModel Layout { get; set; }
+        public LayoutModel? Layout { get; set; }
     }
     
     public static class PageViewModel

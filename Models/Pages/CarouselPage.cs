@@ -19,7 +19,7 @@ namespace Optimizely26.Models.Pages
 			Order = 40
 		)]
 		[UIHint(UIHint.Image)]
-		public virtual ContentReference Image { get; set; }
+		public virtual ContentReference? Image { get; set; }
 	}
 
 
