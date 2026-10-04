@@ -1,4 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <languages>
-  <language name="English" id="en"></language>
+  <language name="English" id="en">
+    <movies>
+      <noresultsfound>No results found for</noresultsfound>
+    </movies>
+  </language>
+  <language name="Svenska" id="sv">
+    <movies>
+      <noresultsfound>Inga resultat hittades för</noresultsfound>
+    </movies>
+  </language>
 </languages>

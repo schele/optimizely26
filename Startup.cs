@@ -31,6 +31,9 @@ namespace Optimizely26
 			
             
             services.AddScoped<IXmlSitemapService, XmlSitemapService>();
+            services.AddHttpClient<IOmdbService, OmdbService>();
+
+            services.AddServerSideBlazor();
 
 
 		}
@@ -63,6 +66,7 @@ namespace Optimizely26
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapContent();
+                endpoints.MapBlazorHub();
             });
 		}
     }

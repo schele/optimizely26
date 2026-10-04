@@ -1,17 +1,12 @@
-﻿@using EPiServer.Web.Mvc.Html
+@using Optimizely26.Blazor
 @using Optimizely26.Models.ViewModels
 
 @model StartPageViewModel
 
-@* <h1>@Html.Raw(Model.CurrentPage.Title)</h1>
-<h2>@Html.Raw(Model.CurrentPage.Preamble)</h2>
-<p>@Html.Raw(Model.CurrentPage.MainBody)</p>
-
-<img src="@Url.ContentUrl(Model.CurrentPage.Image)" />
-
-<h5>@Model.Layout.StartPage?.Name</h5>
-<h5>@Model.Layout.SettingsPage?.LinkToMovies</h5> *@
+@{
+    var cultureName = Model.CurrentPage.Language.Name;
+}
 
 @await Component.InvokeAsync("Carousel")
-@* 
-@Html.PropertyFor(model => model.CurrentPage.Carousel) *@
+
+<component type="typeof(OmdbSearchPage)" render-mode="Server" param-CultureName="@cultureName" />

@@ -1,0 +1,45 @@
+.poster-wrapper {
+    width: 100%;
+    aspect-ratio: 2/3;
+    overflow: hidden;
+    border-top-left-radius: var(--bs-card-inner-border-radius);
+    border-top-right-radius: var(--bs-card-inner-border-radius);
+}
+
+.poster-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform .3s ease;
+}
+
+.movie-card {
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.movie-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--bs-box-shadow) !important;
+}
+
+.movie-card:hover .poster-wrapper img {
+    transform: scale(1.04);
+}
+
+.search-icon-button {
+    position: relative;
+    cursor: pointer;
+}
+
+.search-icon-button:hover:not(:disabled) i {
+    color: var(--bs-warning) !important;
+}
+
+.search-icon-button:disabled {
+    cursor: progress;
+}
+
+a.clean-link {
+    text-decoration: none;
+    color: inherit;
+}

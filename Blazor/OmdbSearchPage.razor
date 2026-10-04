@@ -1,0 +1,162 @@
+@using System.Globalization
+@using EPiServer.Framework.Localization
+@using Optimizely26.Models.Omdb
+@using Optimizely26.Services
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Web
+
+@inject LocalizationService _localizationService
+@inject IOmdbService _omdbService
+
+@code{
+    [Parameter]
+    public string CultureName { get; set; } = string.Empty;
+
+    private CultureInfo CultureInfo { get; set; } = CultureInfo.InvariantCulture;
+    private OmdbSearchModel SearchModel = new OmdbSearchModel();
+    private List<OmdbMovie>? Movies = [];
+    private bool IsSearching = false;
+
+    /// <summary>IMDb ids whose poster URL failed to load; these get the no-poster placeholder.</summary>
+    private readonly HashSet<string> FailedPosters = [];
+
+    /// <summary>The query of the last submitted search; null until the first search.</summary>
+    private string? SearchedQuery;
+
+    protected override void OnInitialized()
+    {
+        CultureInfo = new CultureInfo(CultureName);
+    }
+
+    private async Task FetchMoviesAsync()
+    {
+        if (string.IsNullOrWhiteSpace(SearchModel.Query))
+        {
+            return;
+        }
+        else
+        {
+            Movies?.Clear();
+            FailedPosters.Clear();
+            IsSearching = true;
+            SearchedQuery = SearchModel.Query;
+
+            try
+            {
+                await Task.Delay(750);
+                Movies = await _omdbService.SearchAsync(SearchModel);
+            }
+            finally
+            {
+                IsSearching = false;
+            }
+        }
+    }
+}
+
+<section class="bg-dark text-white py-5 mb-5" data-bs-theme="dark">
+    <div class="container py-lg-4">
+        <div class="row justify-content-center text-center">
+            <div class="col-lg-8">
+                <h1 class="display-5 fw-bold mb-3">Find your next movie</h1>
+                <p class="lead text-body-secondary mb-4">Search thousands of movies, series and episodes.</p>
+
+                <EditForm Model="@SearchModel" OnValidSubmit="FetchMoviesAsync" role="search">
+                    <div class="input-group input-group-lg shadow">
+                        <InputText id="searchInput" class="form-control border-end-0" type="search"
+                                   placeholder="Search for a movie, e.g. Batman" aria-label="Search for a movie"
+                                   @bind-Value="SearchModel.Query" disabled="@IsSearching" />
+                        <button type="submit" class="input-group-text bg-body border-start-0 search-icon-button" id="submitButton"
+                                disabled="@IsSearching" aria-label="Search">
+                            @* The glass stays in the layout (invisible) so the button keeps its size while the spinner shows. *@
+                            <i class="fas fa-magnifying-glass text-body-secondary @(IsSearching ? "invisible" : null)" aria-hidden="true"></i>
+                            @if (IsSearching)
+                            {
+                                <span class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
+                                    <span class="spinner-border spinner-border-sm text-warning" aria-hidden="true"></span>
+                                </span>
+                                <span class="visually-hidden" role="status">Searching…</span>
+                            }
+                        </button>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container pb-5">
+    @if (IsSearching)
+    {
+        <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-4" aria-hidden="true">
+            @for (var i = 0; i < 10; i++)
+            {
+                <div class="col">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="poster-wrapper placeholder-glow">
+                            <span class="placeholder w-100 h-100"></span>
+                        </div>
+                        <div class="card-body placeholder-glow">
+                            <span class="placeholder col-10 mb-2"></span>
+                            <span class="placeholder col-5"></span>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else if (Movies is { Count: > 0 })
+    {
+        <div class="d-flex justify-content-between align-items-baseline mb-3">
+            <h2 class="h5 mb-0">Results for “@SearchedQuery”</h2>
+            <span class="text-body-secondary small">@Movies.Count hits</span>
+        </div>
+
+        <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-4">
+            @foreach (var item in Movies)
+            {
+                var hasPoster = !string.IsNullOrWhiteSpace(item.Poster) && item.Poster != "N/A" && !FailedPosters.Contains(item.ImdbID);
+
+                <div class="col">
+                    <article class="card h-100 border-0 shadow-sm movie-card">
+                        <div class="poster-wrapper position-relative bg-secondary-subtle">
+                            @if (hasPoster)
+                            {
+                                <img src="@item.Poster" class="card-img-top" alt="Poster for @item.Title" loading="lazy"
+                                     @onerror="() => FailedPosters.Add(item.ImdbID)">
+                            }
+                            else
+                            {
+                                <div class="d-flex flex-column align-items-center justify-content-center h-100 text-body-secondary">
+                                    <i class="fas fa-film fa-2x mb-2"></i>
+                                    <small>No poster</small>
+                                </div>
+                            }
+                            <span class="badge text-bg-dark position-absolute top-0 end-0 m-2 text-capitalize">@item.Type</span>
+                        </div>
+                        <div class="card-body">
+                            <h3 class="card-title h6 mb-1">
+                                <a href="https://www.imdb.com/title/@item.ImdbID/" class="stretched-link clean-link" target="_blank" rel="noopener">@item.Title</a>
+                            </h3>
+                            <p class="card-text small text-body-secondary mb-0">@item.Year</p>
+                        </div>
+                    </article>
+                </div>
+            }
+        </div>
+    }
+    else if (SearchedQuery != null)
+    {
+        <div class="text-center py-5">
+            <i class="fas fa-face-frown fa-3x text-body-secondary mb-3"></i>
+            <p class="lead mb-0">@_localizationService.GetStringByCulture("/movies/noresultsfound", CultureInfo) “@SearchedQuery”</p>
+        </div>
+    }
+    else
+    {
+        <div class="text-center py-5 text-body-secondary">
+            <i class="fas fa-clapperboard fa-3x mb-3"></i>
+            <p class="mb-0">Start typing a title above to search.</p>
+        </div>
+    }
+</div>
