@@ -16,7 +16,8 @@ namespace Optimizely26.Models.Pages
             typeof(SettingsPage), 
             typeof(ContainerPage),
 			typeof(ErrorPage),
-			typeof(XmlSitemap)
+			typeof(XmlSitemap),
+			typeof(MoviePage)
 		}
     )]
     public class StartPage : SitePageData

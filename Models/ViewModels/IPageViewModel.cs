@@ -7,5 +7,11 @@ namespace Optimizely26.Models.ViewModels
         T CurrentPage { get; }
 
         LayoutModel? Layout { get; set; }
+
+        /// <summary>The page's &lt;title&gt;.</summary>
+        string PageTitle { get; }
+
+        /// <summary>The page's meta description.</summary>
+        string MetaDescription { get; }
     }
 }

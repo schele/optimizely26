@@ -1,0 +1,268 @@
+@using Optimizely26.Blazor
+@using Optimizely26.Models.ViewModels
+
+@model MoviePageViewModel
+
+@{
+    if (Model.Movie == null)
+    {
+        @* Only reached in edit or preview mode, where the page is opened without ?id= *@
+        <div class="container py-5">
+            <div class="alert alert-info d-flex align-items-center mb-0" role="status">
+                <i class="fas fa-circle-info me-2" aria-hidden="true"></i>Open a movie from the search to see it here.
+            </div>
+        </div>
+
+        return;
+    }
+
+    var movie = Model.Movie;
+
+    @* OMDb uses "N/A" for missing values *@
+    string? Value(string? value) => string.IsNullOrWhiteSpace(value) || value == "N/A" ? null : value;
+    string[] List(string? value) => Value(value)?.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries) ?? [];
+
+    var title = Value(movie.Title) ?? Model.CurrentPage.Name;
+    var year = Value(movie.Year);
+    var rated = Value(movie.Rated);
+    var runtime = Value(movie.Runtime);
+    var released = Value(movie.Released);
+    var type = Value(movie.Type);
+    var genres = List(movie.Genre);
+    var plot = Value(movie.Plot);
+    var poster = Value(movie.Poster);
+    var imdbId = Value(movie.ImdbID);
+    var imdbRating = Value(movie.ImdbRating);
+    var imdbVotes = Value(movie.ImdbVotes);
+    var metascore = Value(movie.Metascore);
+    var director = Value(movie.Director);
+    var writers = List(movie.Writer);
+    var actors = List(movie.Actors);
+    var language = Value(movie.Language);
+    var country = Value(movie.Country);
+    var awards = Value(movie.Awards);
+    var boxOffice = Value(movie.BoxOffice);
+    var ratings = movie.Ratings;
+    var cultureName = Model.CurrentPage.Language.Name;
+
+    var details = new (string Label, string? Value)[]
+    {
+        ("Released", released),
+        ("Language", language),
+        ("Country", country),
+        ("Box office", boxOffice),
+    }.Where(detail => detail.Value != null).ToList();
+}
+
+<section class="movie-hero bg-dark text-white py-5 mb-5" data-bs-theme="dark">
+    @if (poster != null)
+    {
+        <div class="movie-hero-backdrop" style="background-image: url('@poster')" aria-hidden="true"></div>
+    }
+
+    <div class="container position-relative py-lg-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb small mb-4">
+                <li class="breadcrumb-item"><a href="/" class="link-secondary">Movie Finder</a></li>
+                <li class="breadcrumb-item active" aria-current="page">@title</li>
+            </ol>
+        </nav>
+
+        <div class="row g-4 g-lg-5 align-items-center">
+            <div class="col-8 col-sm-5 col-md-4 col-lg-3 mx-auto mx-md-0">
+                <div class="movie-poster rounded-3 shadow-lg bg-secondary-subtle">
+                    @if (poster != null)
+                    {
+                        @* A broken poster URL hides itself and reveals the placeholder below *@
+                        <img src="@poster" alt="Poster for @title" onerror="this.hidden = true; this.nextElementSibling.hidden = false;" />
+                    }
+                    @* [hidden] sits on a plain wrapper because Bootstrap's d-flex would override it *@
+                    <div class="h-100" hidden="@(poster != null)">
+                        <div class="d-flex flex-column align-items-center justify-content-center h-100 text-body-secondary">
+                            <i class="fas fa-film fa-3x mb-2"></i>
+                            <small>No poster</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-8 col-lg-9">
+                @if (type != null)
+                {
+                    <span class="badge text-bg-warning text-capitalize mb-2">@type</span>
+                }
+                <h1 class="display-5 fw-bold mb-2">
+                    @title
+                    @if (year != null)
+                    {
+                        <span class="fw-light text-body-secondary">(@year)</span>
+                    }
+                </h1>
+
+                <ul class="list-inline text-body-secondary mb-3">
+                    @if (rated != null)
+                    {
+                        <li class="list-inline-item"><span class="badge border border-secondary text-body-secondary">@rated</span></li>
+                    }
+                    @if (runtime != null)
+                    {
+                        <li class="list-inline-item"><i class="far fa-clock me-1"></i>@runtime</li>
+                    }
+                    @if (released != null)
+                    {
+                        <li class="list-inline-item"><i class="far fa-calendar me-1"></i>@released</li>
+                    }
+                </ul>
+
+                @if (genres.Length > 0)
+                {
+                    <div class="d-flex flex-wrap gap-2 mb-4">
+                        @foreach (var genre in genres)
+                        {
+                            <span class="badge rounded-pill text-bg-secondary fw-normal px-3 py-2">@genre</span>
+                        }
+                    </div>
+                }
+
+                @if (plot != null)
+                {
+                    <p class="lead mb-4">@plot</p>
+                }
+
+                <div class="d-flex flex-wrap align-items-center gap-4">
+                    @if (imdbRating != null)
+                    {
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-star fa-2x text-warning me-2" aria-hidden="true"></i>
+                            <div class="lh-sm">
+                                <div><span class="fs-4 fw-bold">@imdbRating</span><span class="text-body-secondary">/10</span></div>
+                                @if (imdbVotes != null)
+                                {
+                                    <small class="text-body-secondary">@imdbVotes votes</small>
+                                }
+                            </div>
+                        </div>
+                    }
+
+                    @if (metascore != null)
+                    {
+                        <div class="d-flex align-items-center">
+                            <span class="movie-metascore rounded-2 fw-bold me-2">@metascore</span>
+                            <small class="text-body-secondary lh-sm">Metascore</small>
+                        </div>
+                    }
+
+                    @if (imdbId != null)
+                    {
+                        <a href="https://www.imdb.com/title/@imdbId/" class="btn btn-warning fw-semibold" target="_blank" rel="noopener">
+                            <i class="fab fa-imdb me-2"></i>View on IMDb
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container pb-5">
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <article class="card border-0 shadow-sm h-100">
+                <div class="card-body p-4">
+                    <h2 class="h5 mb-4">Cast &amp; crew</h2>
+
+                    <dl class="row mb-0">
+                        @if (director != null)
+                        {
+                            <dt class="col-sm-3 text-body-secondary fw-normal">Director</dt>
+                            <dd class="col-sm-9">@director</dd>
+                        }
+
+                        @if (writers.Length > 0)
+                        {
+                            <dt class="col-sm-3 text-body-secondary fw-normal">Writers</dt>
+                            <dd class="col-sm-9">@string.Join(", ", writers)</dd>
+                        }
+
+                        @if (actors.Length > 0)
+                        {
+                            <dt class="col-sm-3 text-body-secondary fw-normal">Stars</dt>
+                            <dd class="col-sm-9 mb-0">
+                                <div class="d-flex flex-wrap gap-3">
+                                    @foreach (var actor in actors)
+                                    {
+                                        <div class="d-flex align-items-center">
+                                            <span class="movie-avatar rounded-circle bg-secondary-subtle text-body-secondary me-2" aria-hidden="true">
+                                                <i class="fas fa-user"></i>
+                                            </span>
+                                            @actor
+                                        </div>
+                                    }
+                                </div>
+                            </dd>
+                        }
+                    </dl>
+
+                    @if (details.Count > 0)
+                    {
+                        <hr class="my-4" />
+
+                        <h2 class="h5 mb-4">Details</h2>
+
+                        <dl class="row mb-0">
+                            @foreach (var detail in details)
+                            {
+                                <dt class="col-sm-3 text-body-secondary fw-normal">@detail.Label</dt>
+                                <dd class="col-sm-9">@detail.Value</dd>
+                            }
+                        </dl>
+                    }
+                </div>
+            </article>
+        </div>
+
+        <div class="col-lg-4">
+            <aside class="d-flex flex-column gap-4 h-100">
+                @if (ratings.Count > 0)
+                {
+                    <section class="card border-0 shadow-sm">
+                        <div class="card-body p-4">
+                            <h2 class="h5 mb-3">Ratings</h2>
+                            <ul class="list-group list-group-flush">
+                                @foreach (var rating in ratings)
+                                {
+                                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                        <span class="text-body-secondary">@rating.Source</span>
+                                        <span class="fw-semibold">@rating.Value</span>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    </section>
+                }
+
+                @if (imdbId != null)
+                {
+                    <component type="typeof(MovieRatingBox)" render-mode="Server" param-ImdbId="@imdbId" param-CultureName="@cultureName" />
+                }
+
+                @if (awards != null)
+                {
+                    <section class="card border-0 shadow-sm">
+                        <div class="card-body p-4 d-flex">
+                            <i class="fas fa-trophy fa-2x text-warning me-3" aria-hidden="true"></i>
+                            <div>
+                                <h2 class="h5 mb-1">Awards</h2>
+                                <p class="text-body-secondary mb-0">@awards</p>
+                            </div>
+                        </div>
+                    </section>
+                }
+            </aside>
+        </div>
+    </div>
+
+    <div class="mt-5">
+        <a href="/" class="btn btn-outline-secondary"><i class="fas fa-arrow-left me-2"></i>Back to search</a>
+    </div>
+</div>

@@ -1,0 +1,121 @@
+/* Movie detail page */
+
+.movie-hero {
+	position: relative;
+	overflow: hidden;
+}
+
+/* Blurred poster behind the hero, faded into the dark background */
+.movie-hero-backdrop {
+	position: absolute;
+	inset: -2rem;
+	background-size: cover;
+	background-position: center;
+	filter: blur(24px);
+	opacity: .25;
+}
+
+.movie-hero-backdrop::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(to right, var(--bs-dark) 10%, transparent);
+}
+
+.movie-hero .breadcrumb-item + .breadcrumb-item::before,
+.movie-hero .breadcrumb-item.active {
+	color: var(--bs-secondary-color);
+}
+
+.movie-poster {
+	aspect-ratio: 2/3;
+	overflow: hidden;
+}
+
+.movie-poster img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.movie-metascore {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 2.5rem;
+	height: 2.5rem;
+	background-color: var(--bs-success);
+	color: var(--bs-white);
+}
+
+.movie-avatar {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 2.25rem;
+	height: 2.25rem;
+}
+
+/* MovieFinder rating: light grey stars, each with a gold layer clipped to its share of the score */
+.movie-stars {
+	position: relative;
+	display: inline-flex;
+	line-height: 1;
+	white-space: nowrap;
+	color: var(--bs-border-color);
+}
+
+/* The spacing is padding inside each star, not a gap between them, so half a star is half its box */
+.movie-star {
+	position: relative;
+	display: inline-block;
+	padding: 0 .0625em;
+}
+
+.movie-star-fill {
+	position: absolute;
+	inset: 0 auto 0 0;
+	padding-left: .0625em;
+	overflow: hidden;
+	color: var(--bs-warning);
+}
+
+.movie-stars-input:has(input:not(:disabled)) {
+	cursor: pointer;
+}
+
+/* The range input covers the stars invisibly; a zero-width thumb keeps the pointer position mapped to the value */
+.movie-stars-input input {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	opacity: 0;
+	cursor: inherit;
+	appearance: none;
+	background: transparent;
+}
+
+.movie-stars-input input::-webkit-slider-thumb {
+	appearance: none;
+	width: 0;
+	height: 100%;
+}
+
+.movie-stars-input input::-moz-range-thumb {
+	width: 0;
+	height: 100%;
+	border: 0;
+}
+
+.movie-stars-input:has(input:focus-visible) {
+	outline: 2px solid var(--bs-warning);
+	outline-offset: 4px;
+	border-radius: .25rem;
+}
+
+.movie-rating-comment {
+	white-space: pre-line;
+	overflow-wrap: anywhere;
+}

@@ -12,6 +12,10 @@ namespace Optimizely26.Models.ViewModels
         public T CurrentPage { get; }
      
         public LayoutModel? Layout { get; set; }
+
+        public virtual string PageTitle => CurrentPage.Name;
+
+        public virtual string MetaDescription => CurrentPage.MetaDescription;
     }
     
     public static class PageViewModel
