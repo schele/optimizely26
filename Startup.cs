@@ -32,6 +32,7 @@ namespace Optimizely26
             
             services.AddScoped<IXmlSitemapService, XmlSitemapService>();
             services.AddHttpClient<IOmdbService, OmdbService>();
+            services.AddScoped<IMovieRatingService, MovieRatingService>();
 
             services.AddServerSideBlazor();
 
