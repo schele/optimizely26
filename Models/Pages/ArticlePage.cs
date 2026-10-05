@@ -1,4 +1,5 @@
 using Optimizely26.Business;
+using Optimizely26.Models.Blocks;
 using System.ComponentModel.DataAnnotations;
 
 namespace Optimizely26.Models.Pages
@@ -23,5 +24,13 @@ namespace Optimizely26.Models.Pages
 		)]
 		[CultureSpecific]
 		public virtual XhtmlString? MainBody { get; set; }
+
+		/// <summary>Blocks below the body, such as a contact form. Shared by all languages; the blocks have their own translations.</summary>
+		[Display(
+			GroupName = SystemTabNames.Content,
+			Order = 20
+		)]
+		[AllowedTypes(typeof(ContactFormBlock))]
+		public virtual ContentArea? MainContentArea { get; set; }
 	}
 }

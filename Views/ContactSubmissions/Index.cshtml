@@ -1,0 +1,92 @@
+@using Optimizely26.Models.Contact
+
+@model ContactSubmissionPage
+
+@{
+    // An admin page, not a site page: no site layout
+    Layout = null;
+}
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Contact submissions</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-body-tertiary">
+    <nav class="navbar bg-dark border-bottom border-body" data-bs-theme="dark">
+        <div class="container-fluid">
+            <span class="navbar-brand fw-semibold"><i class="fas fa-envelope-open-text me-2 text-warning" aria-hidden="true"></i>Contact submissions</span>
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="/EPiServer/Cms"><i class="fas fa-arrow-left me-2" aria-hidden="true"></i>Back to the CMS</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container-fluid py-4">
+        <p class="text-body-secondary">
+            @Model.TotalCount @(Model.TotalCount == 1 ? "submission" : "submissions"), newest first. Emails are stored encrypted and decrypted here.
+        </p>
+
+        @if (Model.Items.Count == 0)
+        {
+            <div class="alert alert-info">No one has used the contact form yet.</div>
+        }
+        else
+        {
+            <div class="table-responsive bg-body shadow-sm rounded">
+                <table class="table table-hover align-top mb-0">
+                    <thead>
+                        <tr>
+                            <th scope="col" class="text-nowrap">Received (UTC)</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Email</th>
+                            <th scope="col">Comment</th>
+                            <th scope="col">Page</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Items)
+                        {
+                            <tr>
+                                <td class="text-nowrap"><time datetime="@item.CreatedUtc.ToString("O")">@item.CreatedUtc.ToString("yyyy-MM-dd HH:mm")</time></td>
+                                <td>@item.Name</td>
+                                <td>
+                                    @if (item.Email == null)
+                                    {
+                                        <span class="text-danger" title="The key it was encrypted with is gone">Can't be decrypted</span>
+                                    }
+                                    else
+                                    {
+                                        <a href="mailto:@item.Email">@item.Email</a>
+                                    }
+                                </td>
+                                <td style="white-space: pre-line; min-width: 20rem">@item.Comment</td>
+                                <td class="text-nowrap">@item.PageName <span class="badge text-bg-secondary">@item.Language</span></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            @if (Model.TotalPages > 1)
+            {
+                <nav class="mt-3" aria-label="Submission pages">
+                    <ul class="pagination">
+                        @for (var number = 1; number <= Model.TotalPages; number++)
+                        {
+                            <li class="page-item @(number == Model.Page ? "active" : null)">
+                                <a class="page-link" href="?page=@number" aria-current="@(number == Model.Page ? "page" : null)">@number</a>
+                            </li>
+                        }
+                    </ul>
+                </nav>
+            }
+        }
+    </main>
+</body>
+</html>

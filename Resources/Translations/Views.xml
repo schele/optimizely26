@@ -22,6 +22,17 @@
       <unavailable>Search is unavailable right now. Please try again later.</unavailable>
       <navlink>Search</navlink>
     </find>
+    <contactform>
+      <name>Name</name>
+      <email>Email</email>
+      <comment>Comment</comment>
+      <send>Send</send>
+      <honeypot>Leave this field empty</honeypot>
+      <sent>Thanks! We have received your message.</sent>
+      <invalid>Please fill in every field and use a valid email address.</invalid>
+      <expired>The form expired. Please try again.</expired>
+      <unavailable>The form can only be used on a page.</unavailable>
+    </contactform>
   </language>
   <language name="Svenska" id="sv">
     <movies>
@@ -45,5 +56,16 @@
       <unavailable>Sökningen fungerar inte just nu. Försök igen senare.</unavailable>
       <navlink>Sök</navlink>
     </find>
+    <contactform>
+      <name>Namn</name>
+      <email>E-post</email>
+      <comment>Kommentar</comment>
+      <send>Skicka</send>
+      <honeypot>Lämna det här fältet tomt</honeypot>
+      <sent>Tack! Vi har tagit emot ditt meddelande.</sent>
+      <invalid>Fyll i alla fält och använd en giltig e-postadress.</invalid>
+      <expired>Formuläret har gått ut. Försök igen.</expired>
+      <unavailable>Formuläret kan bara användas på en sida.</unavailable>
+    </contactform>
   </language>
 </languages>

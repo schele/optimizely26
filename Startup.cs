@@ -3,6 +3,8 @@ using EPiServer.Cms.UI.AspNetIdentity;
 using EPiServer.DependencyInjection;
 using EPiServer.Scheduler;
 using EPiServer.Web.Routing;
+using Microsoft.AspNetCore.DataProtection;
+using Optimizely26.Business.ContactForm;
 using Optimizely26.Business.Extensions;
 using Optimizely26.Business.Search;
 using Optimizely26.Services;
@@ -35,6 +37,13 @@ namespace Optimizely26
             services.AddHttpClient<IOmdbService, OmdbService>();
             services.AddScoped<IMovieRatingService, MovieRatingService>();
             services.AddScoped<IFindService, FindService>();
+            services.AddScoped<IContactSubmissionService, ContactSubmissionService>();
+            services.AddSingleton<ContactFormToken>();
+
+            // Contact form emails are encrypted with these keys, so they must survive restarts and deployments
+            services.AddDataProtection()
+                .SetApplicationName("Optimizely26")
+                .PersistKeysToFileSystem(new DirectoryInfo(Path.Combine(webHostingEnvironment.ContentRootPath, "App_Data", "DataProtection-Keys")));
 
             services.AddSingleton<SearchIndex>();
             services.AddSingleton<SearchIndexQueue>();
@@ -75,6 +84,7 @@ namespace Optimizely26
             {
                 endpoints.MapContent();
                 endpoints.MapBlazorHub();
+                endpoints.MapControllers();
             });
 		}
     }
