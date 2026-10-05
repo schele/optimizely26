@@ -2,6 +2,7 @@ using EPiServer.Web.Mvc;
 using EPiServer.Web.Routing;
 using Microsoft.AspNetCore.Mvc;
 using Optimizely26.Business.ContactForm;
+using Optimizely26.Controllers;
 using Optimizely26.Models.Blocks;
 using Optimizely26.Models.Pages;
 using Optimizely26.Models.ViewModels;
@@ -32,6 +33,10 @@ namespace Optimizely26.Blocks.ContactForm
 				Language = page?.Language.Name ?? string.Empty,
 				FormToken = page == null ? null : _formToken.Create(page.ContentLink.ID, page.Language.Name),
 				Status = HttpContext.Request.Query["contact"].ToString(),
+				// What the visitor typed before an invalid or expired post (TempData empties itself once read)
+				Name = TempData[ContactFormController.NameKey] as string,
+				Email = TempData[ContactFormController.EmailKey] as string,
+				Comment = TempData[ContactFormController.CommentKey] as string,
 			};
 
 			return await Task.FromResult(View("~/Views/Shared/ContactForm.cshtml", model));
