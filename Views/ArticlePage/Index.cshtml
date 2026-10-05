@@ -1,0 +1,15 @@
+@using EPiServer.Web.Mvc.Html
+@using Optimizely26.Models.Pages
+@using Optimizely26.Models.ViewModels
+
+@model PageViewModel<ArticlePage>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <article class="col-lg-8">
+            <h1 class="display-6 fw-bold mb-4">@Model.CurrentPage.Name</h1>
+            @Html.PropertyFor(x => x.CurrentPage.MainBody)
+            @Html.PropertyFor(x => x.CurrentPage.MainContentArea)
+        </article>
+    </div>
+</div>

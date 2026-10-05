@@ -3,7 +3,11 @@ using EPiServer.Cms.UI.AspNetIdentity;
 using EPiServer.DependencyInjection;
 using EPiServer.Scheduler;
 using EPiServer.Web.Routing;
+using Microsoft.AspNetCore.DataProtection;
+using Optimizely26.Business;
+using Optimizely26.Business.ContactForm;
 using Optimizely26.Business.Extensions;
+using Optimizely26.Business.Search;
 using Optimizely26.Services;
 
 namespace Optimizely26
@@ -33,6 +37,27 @@ namespace Optimizely26
             services.AddScoped<IXmlSitemapService, XmlSitemapService>();
             services.AddHttpClient<IOmdbService, OmdbService>();
             services.AddScoped<IMovieRatingService, MovieRatingService>();
+            services.AddScoped<IFindService, FindService>();
+            services.AddScoped<IContactSubmissionService, ContactSubmissionService>();
+            services.AddSingleton<ContactFormToken>();
+            services.AddScoped<VisitorAccess>();
+
+            // Contact form emails are encrypted with these keys, so they must survive restarts and deployments
+            var dataProtection = services.AddDataProtection()
+                .SetApplicationName("Optimizely26")
+                .PersistKeysToFileSystem(new DirectoryInfo(Path.Combine(webHostingEnvironment.ContentRootPath, "App_Data", "DataProtection-Keys")));
+
+            if (OperatingSystem.IsWindows())
+            {
+                // Encrypted with the machine key, so a copy of App_Data on another machine can't decrypt emails or forge logins.
+                // Moving the site to another server therefore makes stored emails unreadable there.
+                dataProtection.ProtectKeysWithDpapi(protectToLocalMachine: true);
+            }
+
+            services.AddSingleton<SearchIndex>();
+            services.AddSingleton<SearchIndexQueue>();
+            services.AddScoped<SearchDocumentFactory>();
+            services.AddHostedService<SearchIndexWorker>();
 
             services.AddServerSideBlazor();
 
@@ -68,6 +93,7 @@ namespace Optimizely26
             {
                 endpoints.MapContent();
                 endpoints.MapBlazorHub();
+                endpoints.MapControllers();
             });
 		}
     }

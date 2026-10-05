@@ -1,0 +1,96 @@
+@using System.Globalization
+@using EPiServer.Framework.Localization
+@using Optimizely26.Models.Contact
+@using Optimizely26.Models.ViewModels
+
+@model ContactFormViewModel
+@inject LocalizationService LocalizationService
+
+@{
+    var culture = string.IsNullOrEmpty(Model.Language) ? CultureInfo.CurrentUICulture : CultureInfo.GetCultureInfo(Model.Language);
+
+    string Text(string key, string fallback) => LocalizationService.GetStringByCulture($"/contactform/{key}", fallback, culture);
+}
+
+<section id="contact-form" class="card border-0 shadow-sm my-5">
+    <div class="card-body p-4">
+        @if (!string.IsNullOrWhiteSpace(Model.Heading))
+        {
+            <h2 class="h4 mb-2">@Model.Heading</h2>
+        }
+        @if (!string.IsNullOrWhiteSpace(Model.Intro))
+        {
+            <p class="text-body-secondary mb-4" style="white-space: pre-line">@Model.Intro</p>
+        }
+
+        @* tabindex="-1" and the script below move focus here after the redirect, so screen readers announce the outcome *@
+        @switch (Model.Status)
+        {
+            case "sent":
+                <div class="alert alert-success d-flex align-items-center contact-status" role="status" tabindex="-1">
+                    <i class="fas fa-circle-check me-2" aria-hidden="true"></i>@Text("sent", "Thanks! We have received your message.")
+                </div>
+                <a href="@Context.Request.Path#contact-form" class="icon-link fw-semibold">@Text("sendanother", "Send another message")<i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+                break;
+            case "invalid":
+                <div class="alert alert-danger d-flex align-items-center contact-status" role="alert" tabindex="-1">
+                    <i class="fas fa-triangle-exclamation me-2" aria-hidden="true"></i>@Text("invalid", "Please fill in every field and use a valid email address.")
+                </div>
+                break;
+            case "expired":
+                <div class="alert alert-warning d-flex align-items-center contact-status" role="alert" tabindex="-1">
+                    <i class="fas fa-clock-rotate-left me-2" aria-hidden="true"></i>@Text("expired", "The form expired. Please try again.")
+                </div>
+                break;
+        }
+
+        @if (Model.FormToken == null)
+        {
+            <p class="text-body-secondary mb-0">@Text("unavailable", "The form can only be used on a page.")</p>
+        }
+        else if (Model.Status != "sent")
+        {
+            <form method="post" action="/contact-form/submit">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="@nameof(ContactFormPost.FormToken)" value="@Model.FormToken" />
+                <input type="hidden" name="@nameof(ContactFormPost.PageId)" value="@Model.PageId" />
+                <input type="hidden" name="@nameof(ContactFormPost.Language)" value="@Model.Language" />
+
+                <p class="small text-body-secondary">@Text("allrequired", "All fields are required.")</p>
+
+                <div class="mb-3">
+                    <label for="contact-name" class="form-label fw-semibold">@Text("name", "Name")</label>
+                    <input id="contact-name" name="@nameof(ContactFormPost.Name)" type="text" class="form-control" required
+                           maxlength="@ContactSubmission.NameMaxLength" autocomplete="name" value="@Model.Name" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="contact-email" class="form-label fw-semibold">@Text("email", "Email")</label>
+                    <input id="contact-email" name="@nameof(ContactFormPost.Email)" type="email" class="form-control" required
+                           maxlength="@ContactSubmission.EmailMaxLength" autocomplete="email" value="@Model.Email" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="contact-comment" class="form-label fw-semibold">@Text("comment", "Comment")</label>
+                    <textarea id="contact-comment" name="@nameof(ContactFormPost.Comment)" class="form-control" rows="5" required
+                              maxlength="@ContactSubmission.CommentMaxLength">@Model.Comment</textarea>
+                </div>
+
+                @* The honeypot: off-screen rather than display:none, which some bots skip. People never see or reach it. *@
+                <div class="contact-website" aria-hidden="true">
+                    <label for="contact-website">@Text("honeypot", "Leave this field empty")</label>
+                    <input id="contact-website" name="@nameof(ContactFormPost.Website)" type="text" tabindex="-1" autocomplete="off" />
+                </div>
+
+                <button type="submit" class="btn btn-warning fw-semibold">
+                    <i class="fas fa-paper-plane me-2" aria-hidden="true"></i>@Text("send", "Send")
+                </button>
+            </form>
+        }
+
+        @if (!string.IsNullOrEmpty(Model.Status))
+        {
+            <script>document.querySelector('#contact-form .contact-status')?.focus();</script>
+        }
+    </div>
+</section>
