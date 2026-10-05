@@ -22,9 +22,9 @@ namespace Optimizely26.Initialization
 		public void Initialize(InitializationEngine context)
 		{
 			_queue = context.Services.GetRequiredService<SearchIndexQueue>();
-			QueueRebuildIfNeeded(context.Services);
+			OpenIndex(context.Services);
 
-			// After the rebuild is queued, so the worker handles it before any of these
+			// After a rebuild is queued, so the worker handles it before any of these
 			_contentEvents = context.Services.GetRequiredService<IContentEvents>();
 			_contentEvents.PublishedContent += OnPublishedContent;
 			_contentEvents.MovedContent += OnMovedContent;
@@ -51,30 +51,38 @@ namespace Optimizely26.Initialization
 			}
 		}
 
-		private void QueueRebuildIfNeeded(IServiceProvider services)
+		/// <summary>Opening queues a rebuild when the index is missing or outdated (see <see cref="SearchIndex.EnsureOpen"/>).</summary>
+		private static void OpenIndex(IServiceProvider services)
 		{
-			var logger = services.GetRequiredService<ILogger<SearchIndexInitialization>>();
-
 			try
 			{
-				if (!services.GetRequiredService<SearchIndex>().IsCurrent)
-				{
-					logger.LogInformation("The search index is missing or outdated; rebuilding it in the background");
-					_ = _queue!.RebuildAsync();
-				}
+				services.GetRequiredService<SearchIndex>().EnsureOpen();
 			}
 			catch (Exception e)
 			{
-				// Most likely another process holds the index's write lock. The site still starts; searches show an error.
-				logger.LogError(e, "Opening the search index failed");
+				// Most likely another process holds the index's write lock. The site still starts, searches show
+				// "unavailable", and the first successful open later rebuilds the index.
+				services.GetRequiredService<ILogger<SearchIndexInitialization>>().LogError(e, "Opening the search index failed");
 			}
 		}
 
-		// Also covers unpublishing, and a page that was published again
-		private void OnPublishedContent(object? sender, ContentEventArgs e) => _queue?.Reindex(e.ContentLink);
+		// Also covers unpublishing, and a page that was published again. Blocks and media are never indexed.
+		private void OnPublishedContent(object? sender, ContentEventArgs e)
+		{
+			if (e.Content is null or PageData)
+			{
+				_queue?.Reindex(e.ContentLink);
+			}
+		}
 
 		// Moving to the trash removes the pages and restoring adds them back, because the worker checks where they are now
-		private void OnMovedContent(object? sender, ContentEventArgs e) => _queue?.Reindex(e.ContentLink, includeDescendants: true);
+		private void OnMovedContent(object? sender, ContentEventArgs e)
+		{
+			if (e.Content is null or PageData)
+			{
+				_queue?.Reindex(e.ContentLink, includeDescendants: true);
+			}
+		}
 
 		// The pages can't be loaded any more, so they are removed by id
 		private void OnDeletedContent(object? sender, DeleteContentEventArgs e) => _queue?.Remove(e.DeletedDescendents.Prepend(e.ContentLink));

@@ -4,6 +4,7 @@ using Lucene.Net.Analysis.TokenAttributes;
 using Lucene.Net.Documents;
 using Lucene.Net.Index;
 using Lucene.Net.Search;
+using Optimizely26.Business;
 using Optimizely26.Business.Search;
 using Optimizely26.Models.Find;
 using Optimizely26.Models.Pages;
@@ -11,7 +12,7 @@ using Optimizely26.Models.Pages;
 namespace Optimizely26.Services
 {
 	/// <summary>Searches the site's own Lucene index (see <see cref="SearchIndex"/>) and loads the hits from the CMS.</summary>
-	public class FindService(SearchIndex index, IContentLoader contentLoader, IUrlResolver urlResolver) : IFindService
+	public class FindService(SearchIndex index, VisitorAccess visitorAccess, IContentLoader contentLoader, IUrlResolver urlResolver) : IFindService
 	{
 		/// <summary>Words after this many are ignored.</summary>
 		private const int MaxWords = 10;
@@ -37,6 +38,7 @@ namespace Optimizely26.Services
 		private readonly SearchIndex _index = index;
 		private readonly IContentLoader _contentLoader = contentLoader;
 		private readonly IUrlResolver _urlResolver = urlResolver;
+		private readonly VisitorAccess _visitorAccess = visitorAccess;
 
 		public FindResult FindContent(string query, CultureInfo culture, int page, int pageSize)
 		{
@@ -133,12 +135,16 @@ namespace Optimizely26.Services
 			{ NumericRangeQuery.NewInt64Range(SearchFields.StopPublish, DateTime.UtcNow.Ticks, long.MaxValue, false, true), Occur.MUST },
 		});
 
-		/// <summary>The hit as the page is now; null when it no longer loads (deleted a moment ago; the index catches up shortly).</summary>
+		/// <summary>
+		/// The hit as the page is now; null when it no longer loads, or is no longer published or public. The index catches up
+		/// shortly, but until then a visitor must never see the name of a page they may not read.
+		/// </summary>
 		private Hit? ToHit(Document document, CultureInfo culture)
 		{
 			var contentLink = new ContentReference(int.Parse(document.Get(SearchFields.ContentId), CultureInfo.InvariantCulture));
 
-			if (!_contentLoader.TryGet<SitePageData>(contentLink, new LoaderOptions { LanguageLoaderOption.Specific(culture) }, out var page))
+			if (!_contentLoader.TryGet<SitePageData>(contentLink, new LoaderOptions { LanguageLoaderOption.Specific(culture) }, out var page)
+				|| !_visitorAccess.CanSee(page))
 			{
 				return null;
 			}

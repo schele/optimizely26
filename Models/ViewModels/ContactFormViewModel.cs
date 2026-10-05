@@ -16,5 +16,12 @@ namespace Optimizely26.Models.ViewModels
 
 		/// <summary>The outcome of the last post, from <c>?contact=</c>: sent, invalid or expired.</summary>
 		public string? Status { get; init; }
+
+		/// <summary>What the visitor typed before an invalid or expired post, to fill the form in again.</summary>
+		public string? Name { get; init; }
+
+		public string? Email { get; init; }
+
+		public string? Comment { get; init; }
 	}
 }

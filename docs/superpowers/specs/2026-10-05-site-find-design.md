@@ -160,7 +160,7 @@ The weights and boosts are constants at the top of `FindService`.
 
 `Models/Pages/FindPage.cs`: inherits `SitePageData`, no own properties, group `Specialized`, display name "Find Page".
 
-`Initialization/FindPageInitialization.cs` works like `MoviePageInitialization`: after `SiteSetupInitialization`, if there is a start page and no `FindPage` among its descendants (published or not), it creates and publishes one under the start page, named "Sök" in sv (the master language) and "Search" in en.
+`Initialization/FindPageInitialization.cs` works like `MoviePageInitialization`: after `SiteSetupInitialization`, if there is a start page and no `FindPage` among its descendants (published or not), it creates and publishes one under the start page, named "Sök" in sv and "Search" in en (the start page's master language is en; sv is served at "/").
 
 `Controllers/FindPageController.cs`: `Index(FindPage currentPage, string? q, int page = 1)` returns a `FindPageViewModel` (derives from `PageViewModel<FindPage>`) with `Query` and `Page`.
 

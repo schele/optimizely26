@@ -21,7 +21,8 @@ namespace Optimizely26.Business.ContactForm
 	/// </summary>
 	public class ContactFormToken(IDataProtectionProvider dataProtectionProvider)
 	{
-		public static readonly TimeSpan Lifetime = TimeSpan.FromHours(2);
+		/// <summary>Long enough for a visitor who leaves the tab open over lunch; a replay within it is no worse than a new page load.</summary>
+		public static readonly TimeSpan Lifetime = TimeSpan.FromHours(24);
 
 		/// <summary>People need longer than this to fill in the form; a faster post comes from a bot.</summary>
 		public static readonly TimeSpan MinimumFillTime = TimeSpan.FromSeconds(3);

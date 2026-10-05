@@ -1,14 +1,16 @@
+using EPiServer.Data.Dynamic;
 using EPiServer.DataAccess;
 using EPiServer.Framework;
 using EPiServer.Framework.Initialization;
 using EPiServer.Security;
+using Optimizely26.Business;
 using Optimizely26.Models.Pages;
 
 namespace Optimizely26.Initialization
 {
 	/// <summary>
 	/// Creates and publishes a handful of sample articles under the start page, in Swedish and English, so the site search
-	/// has something to find. Runs only when there is no article at all, neither under the start page nor in the trash.
+	/// has something to find. Once per database (a <c>SetupMarker</c>), and only when the site has no articles yet.
 	/// </summary>
 	/// <remarks>
 	/// Runs after <see cref="SearchIndexInitialization"/>, so the publish events reach the search index.
@@ -19,6 +21,8 @@ namespace Optimizely26.Initialization
 	[ModuleDependency(typeof(SearchIndexInitialization))]
 	public class SampleArticlesInitialization : IInitializableModule
 	{
+		private const string MarkerName = "sample-articles";
+
 		private record SampleText(string Name, string MetaDescription, string MainBody);
 
 		private record SampleArticle(SampleText Swedish, SampleText English);
@@ -81,16 +85,42 @@ namespace Optimizely26.Initialization
 				return;
 			}
 
-			// The trash counts too, so articles an editor deleted don't come back on the next startup
-			var hasArticles = contentRepository.GetDescendents(startPage.ContentLink)
-				.Concat(contentRepository.GetDescendents(ContentReference.WasteBasket))
-				.Any(contentLink => contentRepository.TryGet<ArticlePage>(contentLink, loaderOptions, out _));
+			// Once per database, so articles an editor deleted, even from the trash, don't come back on the next startup
+			var setupMarkers = new SetupMarkers(context.Services.GetRequiredService<DynamicDataStoreFactory>());
 
-			if (hasArticles)
+			if (setupMarkers.Exists(MarkerName))
 			{
 				return;
 			}
 
+			// A site that already has articles (from before the marker existed, or made by editors) needs no samples
+			var hasArticles = contentRepository.GetDescendents(startPage.ContentLink)
+				.Concat(contentRepository.GetDescendents(ContentReference.WasteBasket))
+				.Any(contentLink => contentRepository.TryGet<ArticlePage>(contentLink, loaderOptions, out _));
+
+			if (!hasArticles)
+			{
+				try
+				{
+					CreateArticles(contentRepository, startPage);
+				}
+				catch (Exception e)
+				{
+					// Sample content must never stop the site from starting; no marker, so the next startup tries again
+					context.Services.GetRequiredService<ILogger<SampleArticlesInitialization>>().LogError(e, "Creating the sample articles failed");
+					return;
+				}
+			}
+
+			setupMarkers.Add(MarkerName);
+		}
+
+		public void Uninitialize(InitializationEngine context)
+		{
+		}
+
+		private static void CreateArticles(IContentRepository contentRepository, StartPage startPage)
+		{
 			foreach (var article in Articles)
 			{
 				var page = contentRepository.GetDefault<ArticlePage>(startPage.ContentLink, startPage.MasterLanguage);
@@ -106,10 +136,6 @@ namespace Optimizely26.Initialization
 					contentRepository.Save(languageBranch, SaveAction.Publish, AccessLevel.NoAccess);
 				}
 			}
-		}
-
-		public void Uninitialize(InitializationEngine context)
-		{
 		}
 
 		/// <summary>Swedish for Swedish, English for every other language.</summary>

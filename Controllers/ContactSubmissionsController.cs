@@ -17,6 +17,7 @@ namespace Optimizely26.Controllers
 		private readonly IContactSubmissionService _submissions = submissions;
 
 		[HttpGet("")]
+		[ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)] // Decrypted personal data: keep it out of browser caches
 		public IActionResult Index(int page = 1)
 		{
 			return View(_submissions.GetPage(page, PageSize));

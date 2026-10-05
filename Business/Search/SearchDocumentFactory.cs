@@ -1,9 +1,7 @@
 using System.Globalization;
 using System.Net;
-using System.Security.Principal;
 using System.Text.RegularExpressions;
 using EPiServer.Framework.Web;
-using EPiServer.Security;
 using EPiServer.Web;
 using Lucene.Net.Documents;
 using Optimizely26.Models.Pages;
@@ -14,18 +12,13 @@ namespace Optimizely26.Business.Search
 	public partial class SearchDocumentFactory(
 		IContentLoader contentLoader,
 		IContentTypeRepository contentTypeRepository,
-		IPublishedStateAssessor publishedStateAssessor,
 		ITemplateResolver templateResolver,
-		IContentAccessEvaluator contentAccessEvaluator)
+		VisitorAccess visitorAccess)
 	{
-		/// <summary>A visitor who isn't signed in: no name and no roles, so only pages Everyone or Anonymous may read pass.</summary>
-		private static readonly IPrincipal AnonymousVisitor = new GenericPrincipal(new GenericIdentity(string.Empty), []);
-
 		private readonly IContentLoader _contentLoader = contentLoader;
 		private readonly IContentTypeRepository _contentTypeRepository = contentTypeRepository;
-		private readonly IPublishedStateAssessor _publishedStateAssessor = publishedStateAssessor;
 		private readonly ITemplateResolver _templateResolver = templateResolver;
-		private readonly IContentAccessEvaluator _contentAccessEvaluator = contentAccessEvaluator;
+		private readonly VisitorAccess _visitorAccess = visitorAccess;
 
 		/// <summary>One document per language in which the page belongs in the index; empty when it belongs in none.</summary>
 		/// <remarks>Also empty for content that isn't a <see cref="SitePageData"/>, such as blocks, media and container pages.</remarks>
@@ -42,7 +35,7 @@ namespace Optimizely26.Business.Search
 			return master.ExistingLanguages
 				.Select(culture => _contentLoader.TryGet<SitePageData>(master.ContentLink, new LoaderOptions { LanguageLoaderOption.Specific(culture) }, out var page) ? page : null)
 				.OfType<SitePageData>()
-				.Where(IsVisibleToVisitors)
+				.Where(_visitorAccess.CanSee)
 				.Select(CreateDocument)
 				.ToList();
 		}
@@ -64,10 +57,6 @@ namespace Optimizely26.Business.Search
 
 			return page is StartPage || _contentLoader.GetAncestors(page.ContentLink).OfType<StartPage>().Any();
 		}
-
-		private bool IsVisibleToVisitors(SitePageData page)
-			=> _publishedStateAssessor.IsPublished(page, PublishedStateCondition.None)
-				&& _contentAccessEvaluator.HasAccess(page, AnonymousVisitor, AccessLevel.Read);
 
 		private Document CreateDocument(SitePageData page)
 		{

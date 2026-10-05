@@ -1,8 +1,10 @@
 using System.Globalization;
+using EPiServer.Data.Dynamic;
 using EPiServer.DataAccess;
 using EPiServer.Framework;
 using EPiServer.Framework.Initialization;
 using EPiServer.Security;
+using Optimizely26.Business;
 using Optimizely26.Models.Blocks;
 using Optimizely26.Models.Pages;
 
@@ -10,8 +12,8 @@ namespace Optimizely26.Initialization
 {
 	/// <summary>
 	/// Creates and publishes the contact page: an article ("Kontakt", "Contact") under the start page with a contact form block
-	/// in its "For this page" folder, in every language the start page has. Skipped when an article under the start page, or
-	/// in the trash, already holds a contact form block.
+	/// in its "For this page" folder, in every language the start page has. Once per database (a <c>SetupMarker</c>), and only
+	/// when no article under the start page, or in the trash, already holds a contact form block.
 	/// </summary>
 	/// <remarks>Runs after <see cref="SampleArticlesInitialization"/>, which only seeds a site without articles.</remarks>
 	[InitializableModule]
@@ -19,6 +21,8 @@ namespace Optimizely26.Initialization
 	[ModuleDependency(typeof(SampleArticlesInitialization))]
 	public class ContactPageInitialization : IInitializableModule
 	{
+		private const string MarkerName = "contact-page";
+
 		private record Texts(string PageName, string MetaDescription, string MainBody, string Heading, string Intro);
 
 		private static readonly Texts Swedish = new(
@@ -48,16 +52,43 @@ namespace Optimizely26.Initialization
 				return;
 			}
 
+			// Once per database, so a contact page an editor deleted, even from the trash, doesn't come back on the next startup
+			var setupMarkers = new SetupMarkers(context.Services.GetRequiredService<DynamicDataStoreFactory>());
+
+			if (setupMarkers.Exists(MarkerName))
+			{
+				return;
+			}
+
+			// A site that already has a contact form (from before the marker existed, or made by editors) needs no new one
 			var hasContactForm = contentRepository.GetDescendents(startPage.ContentLink)
 				.Concat(contentRepository.GetDescendents(ContentReference.WasteBasket))
 				.Select(contentLink => contentRepository.TryGet<ArticlePage>(contentLink, loaderOptions, out var article) ? article : null)
 				.Any(article => article?.MainContentArea?.Items.Any(item => contentRepository.TryGet<ContactFormBlock>(item.ContentLink, out _)) == true);
 
-			if (hasContactForm)
+			if (!hasContactForm)
 			{
-				return;
+				try
+				{
+					CreateContactPage(contentRepository, contentAssetHelper, startPage);
+				}
+				catch (Exception e)
+				{
+					// The contact page must never stop the site from starting; no marker, so the next startup tries again
+					context.Services.GetRequiredService<ILogger<ContactPageInitialization>>().LogError(e, "Creating the contact page failed");
+					return;
+				}
 			}
 
+			setupMarkers.Add(MarkerName);
+		}
+
+		public void Uninitialize(InitializationEngine context)
+		{
+		}
+
+		private static void CreateContactPage(IContentRepository contentRepository, ContentAssetHelper contentAssetHelper, StartPage startPage)
+		{
 			var masterLanguage = startPage.MasterLanguage;
 			var otherLanguages = startPage.ExistingLanguages.Where(language => !language.Equals(masterLanguage)).ToList();
 
@@ -85,14 +116,18 @@ namespace Optimizely26.Initialization
 			}
 			catch
 			{
-				// Don't leave a half-made page behind (its asset folder and block go with it); the next startup tries again
-				contentRepository.Delete(pageLink.ToReferenceWithoutVersion(), true, AccessLevel.NoAccess);
+				// Don't leave a half-made page behind (its asset folder and block go with it); the next startup tries again.
+				// A failing delete must not hide the original error.
+				try
+				{
+					contentRepository.Delete(pageLink.ToReferenceWithoutVersion(), true, AccessLevel.NoAccess);
+				}
+				catch
+				{
+				}
+
 				throw;
 			}
-		}
-
-		public void Uninitialize(InitializationEngine context)
-		{
 		}
 
 		private static ContentReference CreateBlock(IContentRepository contentRepository, ContentReference folderLink, CultureInfo masterLanguage, IEnumerable<CultureInfo> otherLanguages)

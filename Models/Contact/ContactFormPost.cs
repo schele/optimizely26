@@ -14,8 +14,8 @@ namespace Optimizely26.Models.Contact
 		[StringLength(ContactSubmission.EmailMaxLength)]
 		public string? Email { get; set; }
 
+		/// <summary>The length is checked in the controller, after line breaks are normalized: browsers send them as two characters.</summary>
 		[Required]
-		[StringLength(ContactSubmission.CommentMaxLength)]
 		public string? Comment { get; set; }
 
 		/// <summary>The honeypot: hidden from people, so anything in it was typed by a bot.</summary>

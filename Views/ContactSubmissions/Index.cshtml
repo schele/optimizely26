@@ -53,12 +53,18 @@
                         @foreach (var item in Model.Items)
                         {
                             <tr>
-                                <td class="text-nowrap"><time datetime="@item.CreatedUtc.ToString("O")">@item.CreatedUtc.ToString("yyyy-MM-dd HH:mm")</time></td>
+                                @* The store hands dates back without a kind; they were saved as UTC *@
+                                <td class="text-nowrap"><time datetime="@DateTime.SpecifyKind(item.CreatedUtc, DateTimeKind.Utc).ToString("O")">@item.CreatedUtc.ToString("yyyy-MM-dd HH:mm")</time></td>
                                 <td>@item.Name</td>
                                 <td>
                                     @if (item.Email == null)
                                     {
                                         <span class="text-danger" title="The key it was encrypted with is gone">Can't be decrypted</span>
+                                    }
+                                    else if (item.Email.IndexOfAny(['?', '&', '%', '/', ':']) >= 0)
+                                    {
+                                        @* Not a plain address: as a mailto link it could add hidden recipients or a prefilled body *@
+                                        <span title="Not linked: not a plain email address">@item.Email</span>
                                     }
                                     else
                                     {
