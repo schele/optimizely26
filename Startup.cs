@@ -4,6 +4,7 @@ using EPiServer.DependencyInjection;
 using EPiServer.Scheduler;
 using EPiServer.Web.Routing;
 using Optimizely26.Business.Extensions;
+using Optimizely26.Business.Search;
 using Optimizely26.Services;
 
 namespace Optimizely26
@@ -33,6 +34,11 @@ namespace Optimizely26
             services.AddScoped<IXmlSitemapService, XmlSitemapService>();
             services.AddHttpClient<IOmdbService, OmdbService>();
             services.AddScoped<IMovieRatingService, MovieRatingService>();
+
+            services.AddSingleton<SearchIndex>();
+            services.AddSingleton<SearchIndexQueue>();
+            services.AddScoped<SearchDocumentFactory>();
+            services.AddHostedService<SearchIndexWorker>();
 
             services.AddServerSideBlazor();
 
