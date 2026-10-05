@@ -4,10 +4,46 @@
     <movies>
       <noresultsfound>No results found for</noresultsfound>
     </movies>
+    <find>
+      <heading>Search the site</heading>
+      <lead>Find pages by their title, description or content.</lead>
+      <placeholder>What are you looking for?</placeholder>
+      <submit>Search</submit>
+      <searching>Searching…</searching>
+      <resultsfor>Results for</resultsfor>
+      <hit>hit</hit>
+      <hits>hits</hits>
+      <readmore>Read more</readmore>
+      <pagination>Search result pages</pagination>
+      <previous>Previous</previous>
+      <next>Next</next>
+      <starttyping>Type what you're looking for above to search.</starttyping>
+      <noresultsfound>No results found for</noresultsfound>
+      <unavailable>Search is unavailable right now. Please try again later.</unavailable>
+      <navlink>Search</navlink>
+    </find>
   </language>
   <language name="Svenska" id="sv">
     <movies>
       <noresultsfound>Inga resultat hittades för</noresultsfound>
     </movies>
+    <find>
+      <heading>Sök på webbplatsen</heading>
+      <lead>Hitta sidor utifrån titel, beskrivning eller innehåll.</lead>
+      <placeholder>Vad letar du efter?</placeholder>
+      <submit>Sök</submit>
+      <searching>Söker…</searching>
+      <resultsfor>Resultat för</resultsfor>
+      <hit>träff</hit>
+      <hits>träffar</hits>
+      <readmore>Läs mer</readmore>
+      <pagination>Sökresultatsidor</pagination>
+      <previous>Föregående</previous>
+      <next>Nästa</next>
+      <starttyping>Skriv vad du letar efter ovan för att söka.</starttyping>
+      <noresultsfound>Inga resultat hittades för</noresultsfound>
+      <unavailable>Sökningen fungerar inte just nu. Försök igen senare.</unavailable>
+      <navlink>Sök</navlink>
+    </find>
   </language>
 </languages>

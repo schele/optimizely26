@@ -1,0 +1,11 @@
+@using Optimizely26.Blazor
+@using Optimizely26.Models.ViewModels
+
+@model FindPageViewModel
+
+<component type="typeof(FindSearchPage)" render-mode="Server"
+           param-CultureName="@Model.CurrentPage.Language.Name"
+           param-InitialQuery="@Model.Query"
+           param-InitialPage="@Model.Page" />
+
+<script src="~/js/find-page.js"></script>

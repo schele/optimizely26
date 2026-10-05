@@ -1,0 +1,16 @@
+.find-results-heading:focus {
+    outline: 0;
+}
+
+.find-hit-title a:hover,
+.find-hit-title a:focus-visible {
+    text-decoration: underline;
+}
+
+.find-hit-description {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    overflow: hidden;
+}

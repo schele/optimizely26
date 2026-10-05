@@ -1,7 +1,9 @@
+@using EPiServer.Framework.Localization
 @using Optimizely26.Models.Pages
 @using Optimizely26.Models.ViewModels
 
 @model IPageViewModel<SitePageData>
+@inject LocalizationService LocalizationService
 
 <!doctype html>
 <html lang="@System.Globalization.CultureInfo.CurrentCulture.TwoLetterISOLanguageName">
@@ -16,6 +18,7 @@
     <link href="~/css/find.css" rel="stylesheet" />
     <link href="~/css/carousel.css" rel="stylesheet" />
     <link href="~/css/movie.css" rel="stylesheet" />
+    <link href="~/css/find-page.css" rel="stylesheet" />
 </head>
 
 <body class="d-flex flex-column min-vh-100 bg-body-tertiary">
@@ -24,6 +27,12 @@
             <a class="navbar-brand fw-semibold" href="/">
                 <i class="fas fa-film me-2 text-warning"></i>Movie Finder
             </a>
+            @if (Model.Layout?.FindPageUrl is string findPageUrl)
+            {
+                <a class="nav-link" href="@findPageUrl">
+                    <i class="fas fa-magnifying-glass me-2" aria-hidden="true"></i>@LocalizationService.GetStringByCulture("/find/navlink", "Search", Model.CurrentPage.Language)
+                </a>
+            }
         </div>
     </nav>
 

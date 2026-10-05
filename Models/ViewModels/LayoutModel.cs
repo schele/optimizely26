@@ -7,5 +7,8 @@ namespace Optimizely26.Models.ViewModels
         public StartPage? StartPage { get; set; }
 
         public SettingsPage? SettingsPage { get; set; }
+
+        /// <summary>The published find page in the current language, for the navbar; null when there is none.</summary>
+        public string? FindPageUrl { get; set; }
     }
 }
