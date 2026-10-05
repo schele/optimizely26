@@ -29,9 +29,14 @@
             </a>
             @if (Model.Layout?.FindPageUrl is string findPageUrl)
             {
-                <a class="nav-link" href="@findPageUrl">
-                    <i class="fas fa-magnifying-glass me-2" aria-hidden="true"></i>@LocalizationService.GetStringByCulture("/find/navlink", "Search", Model.CurrentPage.Language)
-                </a>
+                @* Inside navbar-nav, so the link gets the navbar's light text colour *@
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="@findPageUrl">
+                            <i class="fas fa-magnifying-glass me-2" aria-hidden="true"></i>@LocalizationService.GetStringByCulture("/find/navlink", "Search", Model.CurrentPage.Language)
+                        </a>
+                    </li>
+                </ul>
             }
         </div>
     </nav>
