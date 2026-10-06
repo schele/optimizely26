@@ -18,6 +18,12 @@ namespace Optimizely26.Business
                 Order = 40
             )]
             public const string Specialized = "Specialized";
+
+            [Display(
+                Name = "Menu",
+                Order = 50
+            )]
+            public const string Menu = "Menu";
         }
     }
 }

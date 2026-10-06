@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <languages>
   <language name="English" id="en">
+    <menu>
+      <label>Main menu</label>
+      <toggle>Show or hide the menu</toggle>
+    </menu>
     <movies>
       <noresultsfound>No results found for</noresultsfound>
     </movies>
@@ -37,6 +41,10 @@
     </contactform>
   </language>
   <language name="Svenska" id="sv">
+    <menu>
+      <label>Huvudmeny</label>
+      <toggle>Visa eller dölj menyn</toggle>
+    </menu>
     <movies>
       <noresultsfound>Inga resultat hittades för</noresultsfound>
     </movies>

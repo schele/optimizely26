@@ -1,0 +1,47 @@
+@using EPiServer.Framework.Localization
+@using Optimizely26.Models.Pages
+@using Optimizely26.Models.ViewModels
+
+@model IPageViewModel<SitePageData>
+@inject LocalizationService LocalizationService
+
+@{
+    var language = Model.CurrentPage.Language;
+    var menuItems = Model.Layout?.MenuItems ?? [];
+
+    string Text(string key, string fallback) => LocalizationService.GetStringByCulture($"/menu/{key}", fallback, language);
+}
+
+<nav class="navbar navbar-expand-lg bg-dark border-bottom border-body site-menu" data-bs-theme="dark" aria-label="@Text("label", "Main menu")">
+    <div class="container">
+        <a class="navbar-brand fw-semibold" href="/">
+            <i class="fas fa-film me-2 text-warning"></i>Movie Finder
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#site-menu-items"
+                aria-controls="site-menu-items" aria-expanded="false" aria-label="@Text("toggle", "Show or hide the menu")">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="site-menu-items">
+            <ul class="navbar-nav me-auto">
+                @foreach (var item in menuItems)
+                {
+                    <li class="nav-item">
+                        <a class="nav-link@(item.IsCurrent ? " active" : null)" href="@item.Url" aria-current="@(item.IsCurrent ? "page" : null)">@item.Name</a>
+                    </li>
+                }
+            </ul>
+            @if (Model.Layout?.FindPageUrl is string findPageUrl)
+            {
+                var isFind = Model.CurrentPage is FindPage;
+
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link@(isFind ? " active" : null)" href="@findPageUrl" aria-current="@(isFind ? "page" : null)">
+                            <i class="fas fa-magnifying-glass me-2" aria-hidden="true"></i>@LocalizationService.GetStringByCulture("/find/navlink", "Search", language)
+                        </a>
+                    </li>
+                </ul>
+            }
+        </div>
+    </div>
+</nav>

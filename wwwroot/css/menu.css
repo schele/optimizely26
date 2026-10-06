@@ -1,0 +1,14 @@
+/* The top menu: white links, underlined in white on hover and for the current page */
+.site-menu .nav-link {
+    color: #fff;
+    text-underline-offset: .4rem;
+    text-decoration-thickness: 2px;
+    text-decoration-color: #fff;
+}
+
+.site-menu .nav-link:hover,
+.site-menu .nav-link:focus-visible,
+.site-menu .nav-link.active {
+    color: #fff;
+    text-decoration-line: underline;
+}

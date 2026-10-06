@@ -1,9 +1,7 @@
-@using EPiServer.Framework.Localization
 @using Optimizely26.Models.Pages
 @using Optimizely26.Models.ViewModels
 
 @model IPageViewModel<SitePageData>
-@inject LocalizationService LocalizationService
 
 <!doctype html>
 <html lang="@System.Globalization.CultureInfo.CurrentCulture.TwoLetterISOLanguageName">
@@ -15,6 +13,7 @@
     <base href="~/" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <link href="~/css/menu.css" rel="stylesheet" />
     <link href="~/css/find.css" rel="stylesheet" />
     <link href="~/css/carousel.css" rel="stylesheet" />
     <link href="~/css/movie.css" rel="stylesheet" />
@@ -23,24 +22,7 @@
 </head>
 
 <body class="d-flex flex-column min-vh-100 bg-body-tertiary">
-    <nav class="navbar navbar-expand-lg bg-dark border-bottom border-body" data-bs-theme="dark">
-        <div class="container">
-            <a class="navbar-brand fw-semibold" href="/">
-                <i class="fas fa-film me-2 text-warning"></i>Movie Finder
-            </a>
-            @if (Model.Layout?.FindPageUrl is string findPageUrl)
-            {
-                @* Inside navbar-nav, so the link gets the navbar's light text colour *@
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="@findPageUrl">
-                            <i class="fas fa-magnifying-glass me-2" aria-hidden="true"></i>@LocalizationService.GetStringByCulture("/find/navlink", "Search", Model.CurrentPage.Language)
-                        </a>
-                    </li>
-                </ul>
-            }
-        </div>
-    </nav>
+    @await Html.PartialAsync("Menu", Model)
 
     <main class="flex-grow-1">
         @RenderBody()
