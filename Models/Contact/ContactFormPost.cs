@@ -24,6 +24,9 @@ namespace Optimizely26.Models.Contact
 		/// <summary>The signed token from <c>ContactFormToken</c>.</summary>
 		public string? FormToken { get; set; }
 
+		/// <summary>The reCAPTCHA v3 token the page fetches as the form is sent, see <c>IReCaptchaService</c>.</summary>
+		public string? ReCaptchaToken { get; set; }
+
 		/// <summary>The page the form is on; only used to find the way back, and checked against the token.</summary>
 		public int PageId { get; set; }
 

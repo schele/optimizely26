@@ -40,6 +40,9 @@ namespace Optimizely26
             services.AddScoped<IFindService, FindService>();
             services.AddScoped<IContactSubmissionService, ContactSubmissionService>();
             services.AddSingleton<ContactFormToken>();
+            services.AddOptions<ReCaptchaOptions>().BindConfiguration(ReCaptchaOptions.SectionName);
+            // A short timeout: if Google is slow the post is let through rather than kept waiting
+            services.AddHttpClient<IReCaptchaService, ReCaptchaService>(client => client.Timeout = TimeSpan.FromSeconds(5));
             services.AddScoped<VisitorAccess>();
 
             // Contact form emails are encrypted with these keys, so they must survive restarts and deployments

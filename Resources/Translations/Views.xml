@@ -31,6 +31,7 @@
       <email>Email</email>
       <comment>Comment</comment>
       <send>Send</send>
+      <sending>Sending…</sending>
       <honeypot>Leave this field empty</honeypot>
       <sent>Thanks! We have received your message.</sent>
       <invalid>Please fill in every field and use a valid email address.</invalid>
@@ -38,6 +39,11 @@
       <unavailable>The form can only be used on a page.</unavailable>
       <allrequired>All fields are required.</allrequired>
       <sendanother>Send another message</sendanother>
+      <unverified>We couldn't confirm that a person sent the message. Check that nothing in your browser blocks Google's reCAPTCHA and try again.</unverified>
+      <!-- Google's required notice when its badge is hidden; {0} and {1} become links to its privacy policy and terms -->
+      <recaptchanotice>This form is protected by reCAPTCHA, and the Google {0} and {1} apply.</recaptchanotice>
+      <recaptchaprivacy>Privacy Policy</recaptchaprivacy>
+      <recaptchaterms>Terms of Service</recaptchaterms>
     </contactform>
   </language>
   <language name="Svenska" id="sv">
@@ -71,6 +77,7 @@
       <email>E-post</email>
       <comment>Kommentar</comment>
       <send>Skicka</send>
+      <sending>Skickar…</sending>
       <honeypot>Lämna det här fältet tomt</honeypot>
       <sent>Tack! Vi har tagit emot ditt meddelande.</sent>
       <invalid>Fyll i alla fält och använd en giltig e-postadress.</invalid>
@@ -78,6 +85,10 @@
       <unavailable>Formuläret kan bara användas på en sida.</unavailable>
       <allrequired>Alla fält måste fyllas i.</allrequired>
       <sendanother>Skicka ett till meddelande</sendanother>
+      <unverified>Vi kunde inte bekräfta att meddelandet skickades av en människa. Kontrollera att inget i webbläsaren blockerar Googles reCAPTCHA och försök igen.</unverified>
+      <recaptchanotice>Formuläret skyddas av reCAPTCHA, och Googles {0} och {1} gäller.</recaptchanotice>
+      <recaptchaprivacy>integritetspolicy</recaptchaprivacy>
+      <recaptchaterms>användarvillkor</recaptchaterms>
     </contactform>
   </language>
 </languages>

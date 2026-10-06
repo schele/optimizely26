@@ -12,12 +12,14 @@ namespace Optimizely26.Controllers
 {
 	/// <summary>
 	/// Receives the contact form and sends the visitor back to the page (Post/Redirect/Get) with <c>?contact=</c>
-	/// sent, invalid or expired. Bots get "sent" too, so they can't tell they were caught.
+	/// sent, invalid, expired or unverified. Bots caught by the honeypot or the fill time get "sent" too, so they can't
+	/// tell they were caught.
 	/// </summary>
 	[Route("contact-form")]
 	public class ContactFormController(
 		IAntiforgery antiforgery,
 		ContactFormToken formToken,
+		IReCaptchaService reCaptcha,
 		IContactSubmissionService submissions,
 		IContentLoader contentLoader,
 		VisitorAccess visitorAccess,
@@ -34,8 +36,12 @@ namespace Optimizely26.Controllers
 		private const string Invalid = "invalid";
 		private const string Expired = "expired";
 
+		/// <summary>reCAPTCHA didn't think a person sent it, or couldn't run in the visitor's browser.</summary>
+		private const string Unverified = "unverified";
+
 		private readonly IAntiforgery _antiforgery = antiforgery;
 		private readonly ContactFormToken _formToken = formToken;
+		private readonly IReCaptchaService _reCaptcha = reCaptcha;
 		private readonly IContactSubmissionService _submissions = submissions;
 		private readonly IContentLoader _contentLoader = contentLoader;
 		private readonly VisitorAccess _visitorAccess = visitorAccess;
@@ -76,6 +82,15 @@ namespace Optimizely26.Controllers
 			if (!ModelState.IsValid || !IsPlainEmailAddress(post.Email!.Trim()) || comment is null || comment.Length > ContactSubmission.CommentMaxLength)
 			{
 				return BackToPage(post, Invalid, keepInput: true);
+			}
+
+			// Last, so Google is only asked about posts that would otherwise be stored
+			if (_reCaptcha.IsEnabled
+				&& await _reCaptcha.VerifyAsync(post.ReCaptchaToken, IReCaptchaService.ContactAction, HttpContext.RequestAborted) == ReCaptchaStatus.Failed)
+			{
+				// Told rather than silently dropped like the honeypot, as a low score can be a person
+				_logger.LogInformation("Contact form on page {PageId}: failed the reCAPTCHA check; nothing stored", post.PageId);
+				return BackToPage(post, Unverified, keepInput: true);
 			}
 
 			_submissions.Add(post.Name!.Trim(), post.Email!.Trim(), comment, post.PageId, post.Language);

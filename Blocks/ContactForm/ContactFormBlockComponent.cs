@@ -6,13 +6,15 @@ using Optimizely26.Controllers;
 using Optimizely26.Models.Blocks;
 using Optimizely26.Models.Pages;
 using Optimizely26.Models.ViewModels;
+using Optimizely26.Services;
 
 namespace Optimizely26.Blocks.ContactForm
 {
-	public class ContactFormBlockComponent(IContentLoader contentLoader, ContactFormToken formToken) : AsyncBlockComponent<ContactFormBlock>
+	public class ContactFormBlockComponent(IContentLoader contentLoader, ContactFormToken formToken, IReCaptchaService reCaptcha) : AsyncBlockComponent<ContactFormBlock>
 	{
 		private readonly IContentLoader _contentLoader = contentLoader;
 		private readonly ContactFormToken _formToken = formToken;
+		private readonly IReCaptchaService _reCaptcha = reCaptcha;
 
 		protected override async Task<IViewComponentResult> InvokeComponentAsync(ContactFormBlock currentContent)
 		{
@@ -32,6 +34,7 @@ namespace Optimizely26.Blocks.ContactForm
 				PageId = page?.ContentLink.ID ?? 0,
 				Language = page?.Language.Name ?? string.Empty,
 				FormToken = page == null ? null : _formToken.Create(page.ContentLink.ID, page.Language.Name),
+				ReCaptchaSiteKey = _reCaptcha.IsEnabled ? _reCaptcha.SiteKey : null,
 				Status = HttpContext.Request.Query["contact"].ToString(),
 				// What the visitor typed before an invalid or expired post (TempData empties itself once read)
 				Name = TempData[ContactFormController.NameKey] as string,

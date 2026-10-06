@@ -7,3 +7,8 @@
     height: 1px;
     overflow: hidden;
 }
+
+/* Google allows hiding the reCAPTCHA badge when the form shows its notice instead, which the contact form does */
+.grecaptcha-badge {
+    visibility: hidden;
+}

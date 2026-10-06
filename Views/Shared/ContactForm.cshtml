@@ -42,6 +42,11 @@
                     <i class="fas fa-clock-rotate-left me-2" aria-hidden="true"></i>@Text("expired", "The form expired. Please try again.")
                 </div>
                 break;
+            case "unverified":
+                <div class="alert alert-warning d-flex align-items-center contact-status" role="alert" tabindex="-1">
+                    <i class="fas fa-shield-halved me-2" aria-hidden="true"></i>@Text("unverified", "We couldn't confirm that a person sent the message. Check that nothing in your browser blocks Google's reCAPTCHA and try again.")
+                </div>
+                break;
         }
 
         @if (Model.FormToken == null)
@@ -50,7 +55,8 @@
         }
         else if (Model.Status != "sent")
         {
-            <form method="post" action="/contact-form/submit">
+            @* contact-form.js fetches a reCAPTCHA token as the form is sent when it has a site key (none: the attribute is left out) *@
+            <form method="post" action="/contact-form/submit" class="contact-form" data-recaptcha-site-key="@Model.ReCaptchaSiteKey">
                 @Html.AntiForgeryToken()
                 <input type="hidden" name="@nameof(ContactFormPost.FormToken)" value="@Model.FormToken" />
                 <input type="hidden" name="@nameof(ContactFormPost.PageId)" value="@Model.PageId" />
@@ -82,10 +88,28 @@
                     <input id="contact-website" name="@nameof(ContactFormPost.Website)" type="text" tabindex="-1" autocomplete="off" />
                 </div>
 
+                @* contact-form.js swaps the icon for the spinner and shows the sending text while the form is sent *@
                 <button type="submit" class="btn btn-warning fw-semibold">
-                    <i class="fas fa-paper-plane me-2" aria-hidden="true"></i>@Text("send", "Send")
+                    <i class="fas fa-paper-plane me-2" aria-hidden="true" data-send-icon></i>
+                    <span class="spinner-border spinner-border-sm me-2" aria-hidden="true" hidden></span>
+                    <span data-sending-text="@Text("sending", "Sending…")">@Text("send", "Send")</span>
                 </button>
+
+                @if (Model.ReCaptchaSiteKey != null)
+                {
+                    <input type="hidden" name="@nameof(ContactFormPost.ReCaptchaToken)" />
+
+                    // Google lets sites hide the reCAPTCHA badge (see contact-form.css) as long as this notice is shown instead
+                    var privacy = $"<a href=\"https://policies.google.com/privacy\" class=\"link-secondary\" target=\"_blank\" rel=\"noopener\">{Html.Encode(Text("recaptchaprivacy", "Privacy Policy"))}</a>";
+                    var terms = $"<a href=\"https://policies.google.com/terms\" class=\"link-secondary\" target=\"_blank\" rel=\"noopener\">{Html.Encode(Text("recaptchaterms", "Terms of Service"))}</a>";
+                    var notice = Html.Encode(Text("recaptchanotice", "This form is protected by reCAPTCHA, and the Google {0} and {1} apply."));
+
+                    @* Replace rather than string.Format, so a stray brace in a translation can't break the page *@
+                    <p class="small text-body-secondary mt-3 mb-0">@Html.Raw(notice.Replace("{0}", privacy).Replace("{1}", terms))</p>
+                }
             </form>
+
+            <script src="~/js/contact-form.js" defer></script>
         }
 
         @if (!string.IsNullOrEmpty(Model.Status))

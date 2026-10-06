@@ -14,7 +14,10 @@ namespace Optimizely26.Models.ViewModels
 		/// <summary>The signed form token; null together with <see cref="PageId"/> 0.</summary>
 		public string? FormToken { get; init; }
 
-		/// <summary>The outcome of the last post, from <c>?contact=</c>: sent, invalid or expired.</summary>
+		/// <summary>The public reCAPTCHA v3 key; null when reCAPTCHA isn't configured, and the form is sent without a token.</summary>
+		public string? ReCaptchaSiteKey { get; init; }
+
+		/// <summary>The outcome of the last post, from <c>?contact=</c>: sent, invalid, expired or unverified.</summary>
 		public string? Status { get; init; }
 
 		/// <summary>What the visitor typed before an invalid or expired post, to fill the form in again.</summary>
